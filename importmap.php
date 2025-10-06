@@ -12,9 +12,18 @@
  * The "importmap:require" command can be used to add new entries to this file.
  */
 return [
-    'app' => [
-        'path' => './assets/app.js',
-        'entrypoint' => true,
+    'datatables.net-dt' => [
+        'version' => '2.3.4',
+    ],
+    'jquery' => [
+        'version' => '3.7.1',
+    ],
+    'datatables.net' => [
+        'version' => '2.3.4',
+    ],
+    'datatables.net-dt/css/dataTables.dataTables.min.css' => [
+        'version' => '2.3.4',
+        'type' => 'css',
     ],
     '@hotwired/stimulus' => [
         'version' => '3.2.2',

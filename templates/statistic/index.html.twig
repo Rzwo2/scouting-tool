@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Team Statistik{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <script type="module" src="{{ asset('ts/statistic.ts') }}"></script>
+{%endblock %}
+{% block body %}
+<h1>Statistiken</h1>
+<div id="table-container"></div>
+
+{% endblock %}
