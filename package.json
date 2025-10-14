@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "@biomejs/biome": "2.2.5",
+    "@types/jquery": "^3.5.33",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "datatables.net-dt": "^2.3.4",
+    "jquery": "^3.7.1"
+  }
+}

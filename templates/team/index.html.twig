@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Team{% endblock %}
+
+{% block javascripts %}
+
+{{ parent() }}
+<script type="module" src="{{asset('ts/team/team.ts')}}"></script>
+{% endblock %}
+
+{% block body %}
+
+<h1>Teams</h1>
+<div id="table-container" data-filter-url="{{filterDataUrl}}"></div>
+
+{% endblock %}

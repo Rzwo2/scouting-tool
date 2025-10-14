@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Statistik Import {% endblock title %}
+
+{% block body %}
+
+<h1>Statistik Import</h1>
+
+{{ component('StatisticImportForm', {formData: formData, form: form}) }}
+
+{% endblock body %}
