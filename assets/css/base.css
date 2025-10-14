@@ -7,9 +7,9 @@
    ============================================ */
 :root {
   /* Primary Colors */
-  --color-primary: #0066cc;
+  --color-primary: #cc0019;
   --color-primary-light: #3385db;
-  --color-primary-dark: #004d99;
+  --color-primary-dark: #950518;
 
   /* Secondary Colors */
   --color-secondary: #ff6600;
@@ -299,7 +299,7 @@ thead {
 }
 
 th {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   text-align: left;
   font-weight: 600;
   text-transform: uppercase;
@@ -308,7 +308,7 @@ th {
 }
 
 td {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   border-bottom: 1px solid var(--border-color);
 }
 

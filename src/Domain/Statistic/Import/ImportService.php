@@ -4,36 +4,41 @@ declare(strict_types=1);
 
 namespace App\Domain\Statistic\Import;
 
+use App\Domain\Statistic\Import\Model\FilterModel;
+use App\Domain\Statistic\Import\Model\ImportModel;
+use App\Domain\Statistic\Import\Model\ImportRequestModel;
+use App\Domain\Statistic\Import\Model\ImportTypeModel;
+use App\Entity\PlayerGameStatistic;
+use App\Repository\PlayerRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ImportService
+readonly class ImportService
 {
     public function __construct(
+        #[Autowire(env: 'BALLTIME_TOKEN')]
+        private string $token,
         private HttpClientInterface $client,
-    ){}
+        private SerializerInterface $serializer,
+        private PlayerRepository $playerRepository,
+        private EntityManagerInterface $entityManager,
+    ) {}
 
-    public function importData(): string
+    public function handleImport(ImportTypeModel $importTypeModel): void
     {
-        $token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjFFUVBZQWZQaTZzZHpyVFNrV1dBTCJ9.eyJodHRwczovL2JhbGx0aW1lLmNvL2VtYWlsIjoibDNmdGg0bmRAZ29vZ2xlbWFpbC5jb20iLCJpc3MiOiJodHRwczovL2F1dGguYmFsbHRpbWUuY29tLyIsInN1YiI6ImF1dGgwfDY4ZGU5MzRjNWQ3NmE2YWI5MzRlM2RiNiIsImF1ZCI6WyJodHRwczovL2JhY2tlbmQuYmFsbHRpbWUuY28iLCJodHRwczovL2Rldi1yNmw5MzJyMi51cy5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzU5NjA3OTI2LCJleHAiOjE3NjIxOTk5MjYsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJhenAiOiIzdnZXQ3ZUVG92U1JudVkwRldpQWptRlgxZWc4a05VaiJ9.n1J4LcFeIpZvsMclhe388z15X8DBuiJt2dqtjHsqa60t1y-uflxKTsfiUl8Zc9JSyBYlJdgW-ECRXYwPgJmkgySwvpxJjMDIxQRL3n5Iy_-a64xrljCowEVN-mGvVr7sjX44faXG0GIfiXdCaSZL0UEuVkRsyy0w0PxfVfwCxKXc-DXGMECLRZIE2LD4OngD0AtwlrlJhSmzTvczkC_1bWWgRfYqf6SG76_rQmzAuyfp2NwgkA1bhMFR9EH7PKRakCY3ZBBNUysv43BhuRcPuap6uOjQ2nrDRQtHBVDBO2W5srre9vp3cbh55tTau4ePDYoHQsmFTxUxa1OEAYPIvw';
-
-        $bearerToken = "Bearer $token";
-
-        $jsonBody = '{
-  "video_ids": [
-    "7029cad5-7da8-3b14-bea4-6ab188a68a00"
-  ],
-  "filters": {
-    "firstBallSideOut": false
-  }
-}';
-
-
+        $requestModel = new ImportRequestModel(
+            videoIds: [$importTypeModel->statisticId],
+            filters: new FilterModel(firstBallSideout: false),
+        );
+        $jsonBody = $this->serializer->serialize($requestModel, 'json');
         $response = $this->client->request(
             method: 'POST',
             url: 'https://backend.balltime.com/generate-multi-video-stats?',
             options: [
-                'auth_bearer'=>$token,
-                'body'=> $jsonBody,
+                'auth_bearer' => $this->token,
+                'body' => $jsonBody,
                 'headers' => [
                     'Cache-Control' => 'no-cache',
                     'Content-Type' => 'application/json',
@@ -42,8 +47,34 @@ class ImportService
             ],
         );
 
-        var_dump($response->getStatusCode());
-        return $response->getContent(false);
+        /** @var ImportModel $model */
+        $model = $this->serializer->deserialize($response->getContent(), ImportModel::class, 'json');
+
+        $playerStats = $model->playerStats;
+        dd($model->playerStats);
+
+        /** @var PlayerGameStatistic[] $playerGameStatistics */
+        $playerGameStatistics = array_filter($playerStats, static fn (PlayerGameStatistic $stat) => null !== $stat->jerseyNumber);
+
+        $players = $this->playerRepository->createQueryBuilder('player', 'player.number')
+            ->where('player.number IN (:playerNumbers)')
+            ->andWhere('player.team = :team')
+            ->setParameter('playerNumbers', array_column($playerGameStatistics, 'jerseyNumber'))
+            ->setParameter('team', $importTypeModel->team->getId())
+            ->getQuery()
+            ->getResult();
+
+        foreach ($playerGameStatistics as $playerGameStatistic) {
+            if (null === $player = $players[$playerGameStatistic->jerseyNumber] ?? null) {
+                // TODO: Add flash message if jerseynumber not exists
+                continue;
+            }
+
+            $playerGameStatistic
+                ->setPlayer($player)
+                ->setGame($importTypeModel->game);
+
+            $this->entityManager->persist();
+        }
     }
 }
-

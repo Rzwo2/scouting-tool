@@ -38,8 +38,5 @@ final readonly class PlayerStatsModel
         public ?int $serveAces = null,
         public ?int $serveErrors = null,
         public ?int $serveAttempts = null,
-    )
-    {
-    }
+    ) {}
 }
-

@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: PlayerGameStatisticRepository::class)]
 class PlayerGameStatistic
 {
+    public ?int $jerseyNumber;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -29,59 +31,58 @@ class PlayerGameStatistic
     private bool $isFirstBallSideOut;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $attackKill = null;
+    private ?int $attackKills = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $attackError = null;
+    private ?int $attackErrors = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $attackTotal = null;
+    private ?int $attackAttempts = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $serveAce = null;
+    private ?int $serveAces = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $serveError = null;
+    private ?int $serveErrors = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $serveTotal = null;
+    private ?int $serveAttempts = null;
 
     #[ORM\Column(nullable: true)]
     private ?float $serveRating = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $receive3 = null;
+    private ?int $receive3s = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $receive2 = null;
+    private ?int $receive2s = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $receive1 = null;
+    private ?int $receive1s = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $receive0 = null;
+    private ?int $receive0s = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $setAssist = null;
+    private ?int $setAssists = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $setTotal = null;
+    private ?int $setAttempts = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $digSuccess = null;
+    private ?int $digSuccesss = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $digError = null;
+    private ?int $digErrors = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $blockSingle = null;
+    private ?int $blockBlockSolos = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $blockAssist = null;
+    private ?int $blockBlockAssists = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $blockError = null;
-
+    private ?int $blockBlockErrors = null;
 
     public function getId(): ?int
     {
@@ -136,74 +137,74 @@ class PlayerGameStatistic
         return $this;
     }
 
-    public function getAttackKill(): ?int
+    public function getAttackKills(): ?int
     {
-        return $this->attackKill;
+        return $this->attackKills;
     }
 
-    public function setAttackKill(?int $attackKill): static
+    public function setAttackKills(?int $attackKills): static
     {
-        $this->attackKill = $attackKill;
+        $this->attackKills = $attackKills;
 
         return $this;
     }
 
-    public function getAttackError(): ?int
+    public function getAttackErrors(): ?int
     {
-        return $this->attackError;
+        return $this->attackErrors;
     }
 
-    public function setAttackError(?int $attackError): static
+    public function setAttackErrors(?int $attackErrors): static
     {
-        $this->attackError = $attackError;
+        $this->attackErrors = $attackErrors;
 
         return $this;
     }
 
-    public function getAttackTotal(): ?int
+    public function getAttackAttempts(): ?int
     {
-        return $this->attackTotal;
+        return $this->attackAttempts;
     }
 
-    public function setAttackTotal(?int $attackTotal): static
+    public function setAttackAttempts(?int $attackAttempts): static
     {
-        $this->attackTotal = $attackTotal;
+        $this->attackAttempts = $attackAttempts;
 
         return $this;
     }
 
-    public function getServeAce(): ?int
+    public function getServeAces(): ?int
     {
-        return $this->serveAce;
+        return $this->serveAces;
     }
 
-    public function setServeAce(?int $serveAce): static
+    public function setServeAces(?int $serveAces): static
     {
-        $this->serveAce = $serveAce;
+        $this->serveAces = $serveAces;
 
         return $this;
     }
 
-    public function getServeError(): ?int
+    public function getServeErrors(): ?int
     {
-        return $this->serveError;
+        return $this->serveErrors;
     }
 
-    public function setServeError(?int $serveError): static
+    public function setServeErrors(?int $serveErrors): static
     {
-        $this->serveError = $serveError;
+        $this->serveErrors = $serveErrors;
 
         return $this;
     }
 
-    public function getServeTotal(): ?int
+    public function getServeAttempts(): ?int
     {
-        return $this->serveTotal;
+        return $this->serveAttempts;
     }
 
-    public function setServeTotal(?int $serveTotal): static
+    public function setServeAttempts(?int $serveAttempts): static
     {
-        $this->serveTotal = $serveTotal;
+        $this->serveAttempts = $serveAttempts;
 
         return $this;
     }
@@ -220,98 +221,98 @@ class PlayerGameStatistic
         return $this;
     }
 
-    public function getReceive3(): ?int
+    public function getReceive3s(): ?int
     {
-        return $this->receive3;
+        return $this->receive3s;
     }
 
-    public function setReceive3(?int $receive3): static
+    public function setReceive3s(?int $receive3s): static
     {
-        $this->receive3 = $receive3;
+        $this->receive3s = $receive3s;
 
         return $this;
     }
 
-    public function getReceive2(): ?int
+    public function getReceive2s(): ?int
     {
-        return $this->receive2;
+        return $this->receive2s;
     }
 
-    public function setReceive2(?int $receive2): static
+    public function setReceive2s(?int $receive2s): static
     {
-        $this->receive2 = $receive2;
+        $this->receive2s = $receive2s;
 
         return $this;
     }
 
-    public function getReceive1(): ?int
+    public function getReceive1s(): ?int
     {
-        return $this->receive1;
+        return $this->receive1s;
     }
 
-    public function setReceive1(?int $receive1): static
+    public function setReceive1s(?int $receive1s): static
     {
-        $this->receive1 = $receive1;
+        $this->receive1s = $receive1s;
 
         return $this;
     }
 
-    public function getReceive0(): ?int
+    public function getReceive0s(): ?int
     {
-        return $this->receive0;
+        return $this->receive0s;
     }
 
-    public function setReceive0(?int $receive0): static
+    public function setReceive0s(?int $receive0s): static
     {
-        $this->receive0 = $receive0;
+        $this->receive0s = $receive0s;
 
         return $this;
     }
 
-    public function getSetAssist(): ?int
+    public function getSetAssists(): ?int
     {
-        return $this->setAssist;
+        return $this->setAssists;
     }
 
-    public function setSetAssist(?int $setAssist): static
+    public function setSetAssists(?int $setAssists): static
     {
-        $this->setAssist = $setAssist;
+        $this->setAssists = $setAssists;
 
         return $this;
     }
 
-    public function getSetTotal(): ?int
+    public function getSetAttempts(): ?int
     {
-        return $this->setTotal;
+        return $this->setAttempts;
     }
 
-    public function setSetTotal(?int $setTotal): static
+    public function setSetAttempts(?int $setAttempts): static
     {
-        $this->setTotal = $setTotal;
+        $this->setAttempts = $setAttempts;
 
         return $this;
     }
 
-    public function getDigSuccess(): ?int
+    public function getDigSuccesss(): ?int
     {
-        return $this->digSuccess;
+        return $this->digSuccesss;
     }
 
-    public function setDigSuccess(?int $digSuccess): static
+    public function setDigSuccesss(?int $digSuccesss): static
     {
-        $this->digSuccess = $digSuccess;
+        $this->digSuccesss = $digSuccesss;
 
         return $this;
     }
 
-    public function getDigError(): ?int
+    public function getDigErrors(): ?int
     {
-        return $this->digError;
+        return $this->digErrors;
     }
 
-    public function setDigError(?int $digError): static
+    public function setDigErrors(?int $digErrors): static
     {
-        $this->digError = $digError;
+        $this->digErrors = $digErrors;
 
         return $this;
     }
@@ -321,35 +322,34 @@ class PlayerGameStatistic
         return $this->blockSingle;
     }
 
-    public function setBlockSingle(?int $blockSingle): static
+    public function setBlockBlockSolos(?int $blockSolos): static
     {
-        $this->blockSingle = $blockSingle;
+        $this->blockBlockSolos = $blockSolos;
 
         return $this;
     }
 
-    public function getBlockAssist(): ?int
+    public function getBlockBlockAssists(): ?int
     {
-        return $this->blockAssist;
+        return $this->blockBlockAssists;
     }
 
-    public function setBlockAssist(?int $blockAssist): static
+    public function setBlockBlockAssists(?int $blockAssists): static
     {
-        $this->blockAssist = $blockAssist;
+        $this->blockBlockAssists = $blockAssists;
 
         return $this;
     }
 
-    public function getBlockError(): ?int
+    public function getBlockBlockErrors(): ?int
     {
-        return $this->blockError;
+        return $this->blockBlockErrors;
     }
 
-    public function setBlockError(?int $blockError): static
+    public function setBlockBlockErrors(?int $blockErrors): static
     {
-        $this->blockError = $blockError;
+        $this->blockBlockErrors = $blockErrors;
 
         return $this;
     }
-
 }

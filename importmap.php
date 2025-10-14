@@ -12,6 +12,9 @@
  * The "importmap:require" command can be used to add new entries to this file.
  */
 return [
+    '@symfony/stimulus-bundle' => [
+        'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
+    ],
     'datatables.net-dt' => [
         'version' => '2.3.4',
     ],
@@ -28,10 +31,10 @@ return [
     '@hotwired/stimulus' => [
         'version' => '3.2.2',
     ],
-    '@symfony/stimulus-bundle' => [
-        'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
-    ],
     '@hotwired/turbo' => [
-        'version' => '7.3.0',
+        'version' => '8.0.18',
+    ],
+    '@symfony/ux-live-component' => [
+        'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
     ],
 ];

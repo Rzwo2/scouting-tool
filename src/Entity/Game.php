@@ -15,6 +15,9 @@ class Game
     #[ORM\Column]
     private int $id;
 
+    #[ORM\Column(length: 20, unique: true)]
+    private string $gameId;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private Team $teamOne;
@@ -23,8 +26,8 @@ class Game
     #[ORM\JoinColumn(nullable: false)]
     private Team $teamTwo;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $date = null;
+    #[ORM\Column]
+    private \DateTimeImmutable $date;
 
     /**
      * @var Collection<int, GameSet>
@@ -44,9 +47,26 @@ class Game
         $this->playerGameStatistics = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return $this->teamOne->getName() . ' : ' . $this->teamTwo->getName();
+    }
+
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getGameId(): string
+    {
+        return $this->gameId;
+    }
+
+    public function setGameId(string $gameId): static
+    {
+        $this->gameId = $gameId;
+
+        return $this;
     }
 
     public function getTeamOne(): Team

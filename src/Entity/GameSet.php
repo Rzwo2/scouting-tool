@@ -15,7 +15,7 @@ class GameSet
     private int $id;
 
     #[ORM\ManyToOne(inversedBy: 'gameSets')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
     private Game $game;
 
     #[ORM\Column(type: Types::SMALLINT)]

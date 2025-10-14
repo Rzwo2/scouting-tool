@@ -15,27 +15,16 @@ class Team
     #[ORM\Column]
     private int $id;
 
+    #[ORM\Column(length: 20, unique: true)]
+    private string $teamId;
+
     #[ORM\Column(length: 255, unique: true)]
     private string $name;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $city = null;
+    #[ORM\ManyToOne]
+    private ?Address $address = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $addressStreet = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $addressNumber = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $addressSuffix = null;
-
-    #[ORM\Column(length: 10, nullable: true)]
-    private ?string $addressZip = null;
-
-    /**
-     * @var Collection<int, Player>
-     */
+    /** @var Collection<int, Player> */
     #[ORM\OneToMany(targetEntity: Player::class, mappedBy: 'team')]
     private Collection $players;
 
@@ -44,9 +33,31 @@ class Team
         $this->players = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return $this->name;
+    }
+
+    public function isNew(): bool
+    {
+        return !isset($this->id);
+    }
+
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getTeamId(): string
+    {
+        return $this->teamId;
+    }
+
+    public function setTeamId(string $teamId): static
+    {
+        $this->teamId = $teamId;
+
+        return $this;
     }
 
     public function getName(): string
@@ -61,62 +72,14 @@ class Team
         return $this;
     }
 
-    public function getCity(): ?string
+    public function getAddress(): ?Address
     {
-        return $this->city;
+        return $this->address;
     }
 
-    public function setCity(?string $city): static
+    public function setAddress(?Address $address): static
     {
-        $this->city = $city;
-
-        return $this;
-    }
-
-    public function getAddressStreet(): ?string
-    {
-        return $this->addressStreet;
-    }
-
-    public function setAddressStreet(?string $addressStreet): static
-    {
-        $this->addressStreet = $addressStreet;
-
-        return $this;
-    }
-
-    public function getAddressNumber(): ?string
-    {
-        return $this->addressNumber;
-    }
-
-    public function setAddressNumber(?string $addressNumber): static
-    {
-        $this->addressNumber = $addressNumber;
-
-        return $this;
-    }
-
-    public function getAddressSuffix(): ?string
-    {
-        return $this->addressSuffix;
-    }
-
-    public function setAddressSuffix(?string $addressSuffix): static
-    {
-        $this->addressSuffix = $addressSuffix;
-
-        return $this;
-    }
-
-    public function getAddressZip(): ?string
-    {
-        return $this->addressZip;
-    }
-
-    public function setAddressZip(?string $addressZip): static
-    {
-        $this->addressZip = $addressZip;
+        $this->address = $address;
 
         return $this;
     }
