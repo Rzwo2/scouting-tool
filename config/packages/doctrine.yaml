@@ -26,7 +26,10 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
-
+        dql:
+            string_functions:
+                concat_ws: DoctrineExtensions\Query\Mysql\ConcatWs
+                if: DoctrineExtensions\Query\Mysql\IfElse
 when@test:
     doctrine:
         dbal:

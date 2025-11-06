@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
+/** @extends AbstractCrudController<Team> */
 class TeamCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string

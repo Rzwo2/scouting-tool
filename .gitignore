@@ -12,12 +12,6 @@
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
-
-###> symfony/asset-mapper ###
-/public/assets/
-/assets/vendor/
-###< symfony/asset-mapper ###
-
 /composer.lock
 
 ###> friendsofphp/php-cs-fixer ###
@@ -26,3 +20,9 @@
 ###< friendsofphp/php-cs-fixer ###
 /node_modules/
 /data/
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+/assets/js-compiled/
+###< symfony/asset-mapper ###

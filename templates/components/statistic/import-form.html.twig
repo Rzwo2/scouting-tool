@@ -1,9 +1,8 @@
 <div {{ attributes }}>
-{{ form_start(form) }}
-{{ form_row(form.team) }}
-{{ form_row(form.game) }}
-{{ form_row(form.videoId) }}
-{{ form_row(form.submit) }}
-{{ form_end(form) }}
+{{ form(form, {attr: {
+        'data-action': 'live#action:prevent',
+        'data-live-action-param': 'save'}
+    })
+}}
 </div>
 

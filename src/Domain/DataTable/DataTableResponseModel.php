@@ -7,9 +7,9 @@ namespace App\Domain\DataTable;
 /** @template T of object */
 class DataTableResponseModel
 {
-    /** @param T $data */
+    /** @param T[] $data */
     public function __construct(
-        public $data,
+        public array $data,
         public ?int $recordsFiltered = null,
         public ?int $recordsTotal = null,
         public ?int $draw = null,

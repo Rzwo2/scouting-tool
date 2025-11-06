@@ -7,21 +7,21 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PlayerGameStatisticRepository::class)]
+#[ORM\UniqueConstraint(fields: ['player', 'game', 'isFirstBallSideOut'])]
+#[ORM\Index(fields: ['player', 'game', 'isFirstBallSideOut'])]
 class PlayerGameStatistic
 {
-    public ?int $jerseyNumber;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private int $id;
 
     #[ORM\ManyToOne(inversedBy: 'playerGameStatistics')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
     private Player $player;
 
     #[ORM\ManyToOne(inversedBy: 'playerGameStatistics')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
     private Game $game;
 
     #[ORM\Column(type: Types::SMALLINT)]
@@ -46,6 +46,9 @@ class PlayerGameStatistic
     private ?int $serveErrors = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    private ?int $serve1s = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     private ?int $serveAttempts = null;
 
     #[ORM\Column(nullable: true)]
@@ -62,6 +65,9 @@ class PlayerGameStatistic
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     private ?int $receive0s = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    private ?int $receiveAttempts = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     private ?int $setAssists = null;
@@ -197,6 +203,18 @@ class PlayerGameStatistic
         return $this;
     }
 
+    public function getServe1s(): ?int
+    {
+        return $this->serve1s;
+    }
+
+    public function setServe1s(?int $serve1s): static
+    {
+        $this->serve1s = $serve1s;
+
+        return $this;
+    }
+
     public function getServeAttempts(): ?int
     {
         return $this->serveAttempts;
@@ -265,6 +283,18 @@ class PlayerGameStatistic
     public function setReceive0s(?int $receive0s): static
     {
         $this->receive0s = $receive0s;
+
+        return $this;
+    }
+
+    public function getReceiveAttempts(): ?int
+    {
+        return $this->receiveAttempts;
+    }
+
+    public function setReceiveAttempts(?int $receiveAttempts): static
+    {
+        $this->receiveAttempts = $receiveAttempts;
 
         return $this;
     }
@@ -351,5 +381,69 @@ class PlayerGameStatistic
         $this->blockBlockErrors = $blockErrors;
 
         return $this;
+    }
+
+    public function getTotalPoints(): int
+    {
+        return $this->serveAces + $this->attackKills + $this->blockBlockSolos + $this->blockBlockAssists;
+    }
+
+    public function getTotalWinMinusLose(): int
+    {
+        return $this->getTotalPoints() - $this->serveErrors - $this->attackErrors - $this->blockBlockErrors - $this->digErrors;
+    }
+
+    public function getServeSuccesss(): int
+    {
+        return $this->serveAces + $this->serve1s;
+    }
+
+    public function getServeSuccesssPercent(): ?float
+    {
+        return self::calcPercent($this->getServeSuccesss(), $this->serveAttempts);
+    }
+
+    public function getServeErrorPercent(): ?float
+    {
+        return self::calcPercent($this->serveErrors, $this->serveAttempts);
+    }
+
+    public function getReceivePerfPercent(): ?float
+    {
+        return self::calcPercent($this->receive3s, $this->getReceiveAttempts());
+    }
+
+    public function getReceiveNegPercent(): ?float
+    {
+        return self::calcPercent($this->receive1s, $this->getReceiveAttempts());
+    }
+
+    public function getReceiveErrorPercent(): ?float
+    {
+        return self::calcPercent($this->receive0s, $this->getReceiveAttempts());
+    }
+
+    public function getAttackKillPercent(): ?float
+    {
+        return self::calcPercent($this->attackKills, $this->attackAttempts);
+    }
+
+    public function getAttackErrorPercent(): ?float
+    {
+        return self::calcPercent($this->attackErrors, $this->attackAttempts);
+    }
+
+    private static function calcPercent(?int $part, ?int $total): ?float
+    {
+        if (!$total) {
+            return null;
+        }
+
+        $percent = 0;
+        if ($part) {
+            $percent = round($part / $total, 5);
+        }
+
+        return $percent;
     }
 }

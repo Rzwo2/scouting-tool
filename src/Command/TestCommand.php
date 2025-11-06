@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Domain\Statistic\Import\ImportService;
+use App\Domain\DataTable\AjaxData;
+use App\Domain\DataTable\AjaxDataSearch;
+use App\Domain\Statistic\Import\StatisticImportService;
+use App\Domain\Statistic\StatisticService;
+use App\Repository\PlayerGameStatisticRepository;
 use App\Repository\TeamRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,8 +23,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class TestCommand extends Command
 {
     public function __construct(
-        private readonly ImportService $importService,
+        private readonly StatisticImportService $importService,
         private readonly TeamRepository $teamRepository,
+        private readonly PlayerGameStatisticRepository $playerGameStatisticRepository,
+        private readonly StatisticService $statisticService,
     ) {
         parent::__construct();
     }
@@ -30,8 +35,11 @@ class TestCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $coll = new ArrayCollection(['one', 'two', 3]);
-        var_dump($coll->findFirst(fn ($key, $val) => 4 === $val));
+        $ajaxData = new AjaxData(1, 0, 20, [], [], new AjaxDataSearch('', false));
+
+        $result = $this->statisticService->handleDataFetchRequest($ajaxData);
+
+        var_dump($result);
 
         return Command::SUCCESS;
     }

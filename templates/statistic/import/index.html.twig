@@ -2,10 +2,73 @@
 
 {% block title %} Statistik Import {% endblock title %}
 
+{% block headline %} Statistik Import {% endblock headline %}
+
 {% block body %}
-
-<h1>Statistik Import</h1>
-
-{{ component('StatisticImportForm', {formData: formData, form: form}) }}
+<dialog id="import-dialog">
+    <header><h2>Statistik Import</h2></header>
+    <article>{{ component('StatisticImportForm', {formData: formData, form: form}) }}</article>
+</dialog>
+<button id='import-button'>IMPORT</button>
 
 {% endblock body %}
+
+{% block javascripts %}
+{{parent()}}
+
+<script type="module">
+import $ from 'jquery';
+$(document).ready(function() {
+    const $importButton = $('#import-button');
+    const $importDialog = $('#import-dialog');
+    const importDialog = $importDialog.get(0);
+    $importButton.on('click', () => importDialog.showModal());
+
+    $importDialog.on('click', (event) => {
+        if(event.target == importDialog){
+            importDialog.close();
+        }
+    });
+
+    $importDialog.on('show', (event) => {
+    console.log(event);
+    });
+});
+
+</script>
+
+{% endblock javascripts %}
+
+
+{% block stylesheets %}
+{{ parent() }}
+
+<!-- <style> -->
+<!---->
+<!-- input#import-button + div { -->
+<!--     width: 100%; -->
+<!--     height: 100vh; -->
+<!--     display: block; -->
+<!--     background-color: rgba(5, 5, 5, .5); -->
+<!--     backdrop-filter: blur(2px); -->
+<!--     position: absolute; -->
+<!--     left: 0; -->
+<!--     top: 0; -->
+<!---->
+<!--     form { -->
+<!---->
+<!--     } -->
+<!-- } -->
+<!---->
+<!-- input#import-button { -->
+<!--     &:not(:checked) + div { -->
+<!--         visibility: hidden; -->
+<!--     } -->
+<!---->
+<!--     &:checked + div { -->
+<!--         visibility: visible; -->
+<!--     } -->
+<!-- } -->
+<!-- </style> -->
+
+{% endblock stylesheets %}

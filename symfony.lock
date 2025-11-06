@@ -86,9 +86,6 @@
             "bin/phpunit"
         ]
     },
-    "sensiolabs/typescript-bundle": {
-        "version": "v0.2.2"
-    },
     "symfony/apache-pack": {
         "version": "1.0",
         "recipe": {

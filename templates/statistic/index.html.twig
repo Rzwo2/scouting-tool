@@ -1,12 +1,21 @@
-{% extends 'base.html.twig' %}
+{% extends 'main.html.twig' %}
 
 {% block title %}Team Statistik{% endblock %}
-{% block stylesheets %}
-    {{ parent() }}
-    <script type="module" src="{{ asset('ts/statistic.ts') }}"></script>
-{%endblock %}
-{% block body %}
-<h1>Statistiken</h1>
-<div id="table-container"></div>
 
-{% endblock %}
+{% block importmap %}{{ importmap(['app', 'statistic']) }}{% endblock %}
+
+{%- block headline -%} Statistik {%- endblock headline -%}
+
+{% block main %}
+{% if is_granted('ROLE_ADMIN') %}
+    <dialog id="import-dialog">
+        <header><h2>Statistik Import</h2></header>
+        <article>{{ component('StatisticImportForm', {formData: formData, form: form}) }}</article>
+    </dialog>
+    <button id='import-button' style="float:right;">IMPORT</button>
+{% endif %}
+
+{{component('StatisticOverviewController')}}
+<div id="table-container" class="table-container" data-url="{{dataUrl}}"></div>
+
+{% endblock main %}

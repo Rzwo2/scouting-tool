@@ -47,7 +47,7 @@ class StatisticImportType extends AbstractType
                     'label' => 'Spiel',
                     'required' => true,
                     'placeholder' => 'Wähle ein Spiel',
-                    'attr' => null === $team ? ['disabled' => true] : [],
+                    'disabled' => !$team,
                     'query_builder' => function (EntityRepository $er) use ($team): QueryBuilder {
                         if (!$team) {
                             return $er->createQueryBuilder('game')
@@ -74,14 +74,15 @@ class StatisticImportType extends AbstractType
                     'label' => 'Video-ID',
                     'help' => 'Die Video-ID ist der letzte Teil der URL, auf der Seite wo das Video angezeigt wird.',
                     'required' => true,
-                    'attr' => null === $game ? ['disabled' => true] : [],
+                    'disabled' => !$game,
                 ]);
         });
 
         $builder->addDependent('submit', 'videoId', function (DependentField $field, ?string $videoId) {
             $field
                 ->add(type: SubmitType::class, options: [
-                    'attr' => null === $videoId ? ['disabled' => true] : [],
+                    'label' => 'Importieren',
+                    'disabled' => !$videoId,
                 ]
                 );
         });

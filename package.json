@@ -1,12 +1,44 @@
 {
-  "type": "module",
-  "devDependencies": {
-    "@biomejs/biome": "2.2.5",
-    "@types/jquery": "^3.5.33",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "datatables.net-dt": "^2.3.4",
-    "jquery": "^3.7.1"
-  }
+    "scripts": {
+        "ts:build": "tsc",
+        "ts:watch": "tsc --watch",
+        "ts:dev": "npm run ts:watch"
+    },
+    "type": "module",
+    "devDependencies": {
+        "@biomejs/biome": "2.2.5",
+        "@hotwired/stimulus": "^3.0.0",
+        "@hotwired/turbo": "^7.1.0 || ^8.0",
+        "@swc/cli": "^0.7.8",
+        "@swc/core": "^1.13.5",
+        "@symfony/stimulus-bridge": "^3.2.0 || ^4.0.0",
+        "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
+        "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
+        "@types/jquery": "^3.5.33",
+        "@types/node": "^24.8.1",
+        "@types/select2": "^4.0.63",
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "datatables.net-dt": "^2.3.4",
+        "jquery": "^3.7.1"
+    },
+    "name": "scouting-tool",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+        "test": "tests"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Rzwo2/scouting-tool.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Rzwo2/scouting-tool/issues"
+    },
+    "homepage": "https://github.com/Rzwo2/scouting-tool#readme"
 }

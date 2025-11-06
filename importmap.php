@@ -12,11 +12,25 @@
  * The "importmap:require" command can be used to add new entries to this file.
  */
 return [
+    'app' => [
+        'path' => './assets/app.js',
+        'entrypoint' => true,
+    ],
+    'statistic' => [
+        'path' => './assets/js-compiled/statistic/statistic.js',
+        'entrypoint' => true,
+    ],
     '@symfony/stimulus-bundle' => [
         'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
     ],
-    'datatables.net-dt' => [
-        'version' => '2.3.4',
+    '@symfony/ux-live-component' => [
+        'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
+    ],
+    '@hotwired/stimulus' => [
+        'version' => '3.2.2',
+    ],
+    '@hotwired/turbo' => [
+        'version' => '8.0.20',
     ],
     'jquery' => [
         'version' => '3.7.1',
@@ -24,17 +38,32 @@ return [
     'datatables.net' => [
         'version' => '2.3.4',
     ],
+    'datatables.net-dt' => [
+        'version' => '2.3.4',
+    ],
     'datatables.net-dt/css/dataTables.dataTables.min.css' => [
         'version' => '2.3.4',
         'type' => 'css',
     ],
-    '@hotwired/stimulus' => [
-        'version' => '3.2.2',
+    'select2' => [
+        'version' => '4.1.0-rc.0',
     ],
-    '@hotwired/turbo' => [
-        'version' => '8.0.18',
+    'select2/dist/css/select2.min.css' => [
+        'version' => '4.1.0-rc.0',
+        'type' => 'css',
     ],
-    '@symfony/ux-live-component' => [
-        'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
+    'select2/dist/css/select2.css' => [
+        'version' => '4.1.0-rc.0',
+        'type' => 'css',
+    ],
+    'bootstrap' => [
+        'version' => '5.3.8',
+    ],
+    '@popperjs/core' => [
+        'version' => '2.11.8',
+    ],
+    'bootstrap/dist/css/bootstrap.min.css' => [
+        'version' => '5.3.8',
+        'type' => 'css',
     ],
 ];

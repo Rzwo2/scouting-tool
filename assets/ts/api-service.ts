@@ -1,7 +1,7 @@
 import { type AjaxResponse } from "datatables.net-dt";
 
 export class ApiService {
-        static async filterData<T>(url: URL): Promise<T> {
+        static async filterData<T>(url: string): Promise<T> {
                 const response = await fetch(url, {
                         method: 'POST',
                         headers: {
