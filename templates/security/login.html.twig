@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Scouting Tool Login{% endblock %}
+
+{% block body %}
+<div class="va-center full-height">
+    <div class="login-main">
+        <div>
+            <form class="login" method="post">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                {% if app.user %}
+                    <div class="mb-3">
+                        Du bist angemeldet als {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                    </div>
+                {% endif %}
+
+                <h2 class="h3 mb-3 font-weight-normal">Anmeldung</h2>
+                <div class="mb-3">
+                    <label for="username">Benutzername</label>
+                    <input type="text" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="username" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="password">Passwort</label>
+                    <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="remember-me">Angemeldet bleiben</label>
+                    <input type="checkbox" id="remember-me" name="_remember_me">
+                </div>
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+                <button class="btn btn-lg btn-primary" type="submit">
+                    Anmelden
+                </button>
+            </form>
+        </div>
+        <div>
+            <img src="{{ asset('media/images/login-background.webp') }}" alt="register-image">
+        </div>
+    </div>
+</div>
+{% endblock %}

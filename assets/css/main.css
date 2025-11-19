@@ -1,0 +1,49 @@
+nav#nav-top {
+    display: grid;
+    grid-auto-columns: 1fr 1fr 1fr;
+    grid-auto-flow: column;
+    column-gap: var(--spacing);
+    background-image: linear-gradient(to right, var(--primary-dark), var(--primary));
+    padding: var(--spacing-s);
+    margin-bottom: var(--spacing-s);
+    align-items: center;
+
+    h1 {
+        justify-self: center;
+        color: var(--text-inverse);
+        margin: 0;
+    }
+
+    #profile {
+        justify-self: right;
+    }
+}
+
+table {
+    background-image: linear-gradient(45deg, var(--bg), var(--bg-light));
+
+    thead {
+        background-image: linear-gradient(to right, var(--primary-dark), var(--primary));
+
+        th {
+            border: 1px solid rgba(0, 0, 0, .15);
+
+            span.dt-column-order:before,
+            span.dt-column-order:after {
+                opacity: .25;
+            }
+
+            &.ordering-asc span.dt-column-order:before,
+            &.ordering-desc span.dt-column-order:after {
+                opacity: .75;
+            }
+        }
+    }
+}
+
+.dt-scroll-body {
+    @media (width>1000px) {
+
+        overflow-x: hidden !important;
+    }
+}

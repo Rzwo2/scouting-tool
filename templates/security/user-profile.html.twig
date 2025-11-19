@@ -1,0 +1,25 @@
+{% extends 'main.html.twig' %}
+
+{% block title %}Profil{% endblock %}
+
+{%- block headline -%}Profil{%- endblock -%}
+
+{% block main %}
+<section class="overview">
+  <div class="property">Benutzername</div>
+  <div class="value">{{ app.user.username }}</div>
+  <div class="property">Email-Adresse</div>
+  <div class="value">{{ app.user.email }}</div>
+</section>
+<button id="change-password">Passwort ändern</button>
+{% endblock main %}
+
+{% block stylesheets %}
+{{parent()}}
+<style>
+.overview{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+</style>
+{% endblock stylesheets %}

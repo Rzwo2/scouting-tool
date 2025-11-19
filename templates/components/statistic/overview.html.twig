@@ -1,0 +1,14 @@
+<nav class="dt-filter" {{ attributes }}>
+<select id="select-team" data-model="team">
+    <option value="">Wähle ein Team</option>
+    {% for team in this.teamsData %}
+        <option value="{{team.name}}">{{team.name}}</option>
+    {% endfor %}
+</select>
+<select id="select-game" data-model="game">
+    <option value="">Wähle ein Spiel</option>
+    {% for game in this.gamesData %}
+        <option value="{{game.name}}">{{game.name}}</option>
+    {% endfor %}
+</select>
+</nav>

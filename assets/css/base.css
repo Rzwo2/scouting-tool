@@ -114,9 +114,12 @@ body {
     color: var(--text);
     background-image: radial-gradient(var(--primary-dark), #000000e6);
     font-weight: 400;
-    max-width: 1600px;
     min-height: 100svh;
-    margin: auto;
+    margin: 0;
+}
+
+.main {
+    margin: 0 var(--spacing);
 }
 
 /* ### HEADINGS ### */

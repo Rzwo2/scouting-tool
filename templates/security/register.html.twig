@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registrieren{% endblock title %}
+
+{%block body %}
+<div class="va-center full-height">
+<div class="register-main">
+    <div>
+        <h1>Registrierung</h1>
+        {{form(form)}}
+        <p>Du bist schon registriert? <a href="/login">Einloggen</a></p>
+    </div>
+    <div>
+        <img src="{{ asset('media/images/login-background.webp') }}" alt="register-image">
+    </div>
+</div>
+</div>
+{% endblock body %}
