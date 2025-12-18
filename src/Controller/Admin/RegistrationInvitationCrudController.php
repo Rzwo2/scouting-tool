@@ -58,6 +58,7 @@ class RegistrationInvitationCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield TextField::new('email', 'E-Mail')->setRequired(true);
+        yield TextField::new('role');
 
         if (in_array($pageName, [Crud::PAGE_INDEX, Crud::PAGE_DETAIL])) {
             yield TextField::new('status', 'Status');

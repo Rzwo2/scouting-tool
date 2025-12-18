@@ -1,25 +1,56 @@
-
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
+  php:
+    image: ${IMAGES_PREFIX:-}app-php
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
+      DEFAULT_URI: https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}
+      SYMFONY_VERSION: ${SYMFONY_VERSION:-}
+      STABILITY: ${STABILITY:-stable}
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - name: http
+        target: 80
+        published: ${HTTP_PORT:-80}
+        protocol: tcp
+      - name: https
+        target: 443
+        published: ${HTTPS_PORT:-443}
+        protocol: tcp
+      - name: http3
+        target: 443
+        published: ${HTTP3_PORT:-443}
+        protocol: udp
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: 'mariadb:11.8'
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_HOST: ${MARIADB_HOST}
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u$MARIADB_USER -p\"$MARIADB_PASSWORD\""]
       timeout: 5s
       retries: 5
       start_period: 60s
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - ./docker/db/data:/var/lib/mysql:rw
+    ports:
+        # To allow the host machine to access the ports below, modify the lines below.
+        # For example, to allow the host to connect to port 3306 on the container, you would change
+        # "3306" to "3306:3306". Where the first port is exposed to the host and the second is the container port.
+        # See https://docs.docker.com/compose/compose-file/compose-file-v3/#ports for more information.
+      - '3306:3306'
 
 volumes:
-###> doctrine/doctrine-bundle ###
-  database_data:
-###< doctrine/doctrine-bundle ###
+  caddy_data:
+  caddy_config:
+
