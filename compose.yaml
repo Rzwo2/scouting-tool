@@ -42,10 +42,6 @@ services:
         target: 443
         published: ${HTTPS_PORT:-443}
         protocol: tcp
-      - name: http3
-        target: 443
-        published: ${HTTP3_PORT:-443}
-        protocol: udp
     depends_on:
       database:
         condition: service_healthy
