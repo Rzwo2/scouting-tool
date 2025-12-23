@@ -28,6 +28,5 @@
 ###< symfony/asset-mapper ###
 
 ###> docker ###
-/.env
 /docker/
 ###< docker ###

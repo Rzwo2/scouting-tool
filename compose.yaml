@@ -1,4 +1,27 @@
 services:
+  database:
+    image: 'mariadb:11.8'
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_HOST: ${MARIADB_HOST}
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u$MARIADB_USER -p\"$MARIADB_PASSWORD\""]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - ./docker/db/data:/var/lib/mysql:rw
+    ports:
+        # To allow the host machine to access the ports below, modify the lines below.
+        # For example, to allow the host to connect to port 3306 on the container, you would change
+        # "3306" to "3306:3306". Where the first port is exposed to the host and the second is the container port.
+        # See https://docs.docker.com/compose/compose-file/compose-file-v3/#ports for more information.
+      - '3306:3306'
+
   php:
     image: ${IMAGES_PREFIX:-}app-php
     restart: unless-stopped
@@ -26,29 +49,6 @@ services:
     depends_on:
       database:
         condition: service_healthy
-
-  database:
-    image: 'mariadb:11.8'
-    restart: always
-    environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${MARIADB_DATABASE}
-      MARIADB_USER: ${MARIADB_USER}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
-      MARIADB_HOST: ${MARIADB_HOST}
-    healthcheck:
-      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u$MARIADB_USER -p\"$MARIADB_PASSWORD\""]
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    volumes:
-      - ./docker/db/data:/var/lib/mysql:rw
-    ports:
-        # To allow the host machine to access the ports below, modify the lines below.
-        # For example, to allow the host to connect to port 3306 on the container, you would change
-        # "3306" to "3306:3306". Where the first port is exposed to the host and the second is the container port.
-        # See https://docs.docker.com/compose/compose-file/compose-file-v3/#ports for more information.
-      - '3306:3306'
 
 volumes:
   caddy_data:
