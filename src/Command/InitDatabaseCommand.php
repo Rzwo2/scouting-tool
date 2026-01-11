@@ -9,6 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsCommand(
@@ -27,17 +28,19 @@ class InitDatabaseCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $output = new SymfonyStyle($input, $output);
+
         $email = $_ENV['SUPERADMIN_EMAIL'] ?? null;
         $password = $_ENV['SUPERADMIN_PASSWORD'] ?? null;
 
         if (!$email || !$password) {
-            $output->writeln('<error>Missing SUPERADMIN_EMAIL or SUPERADMIN_PASSWORD env variables.</error>');
+            $output->error('Missing SUPERADMIN_EMAIL or SUPERADMIN_PASSWORD env variables.');
 
             return Command::FAILURE;
         }
 
         if ($this->userRepository->count(['email' => $email])) {
-            $output->writeln('Super admin already exists.');
+            $output->info('Super admin already exists.');
 
             return Command::SUCCESS;
         }
@@ -49,11 +52,14 @@ class InitDatabaseCommand extends Command
 
         $hashed = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashed);
+        try {
+            $this->em->persist($user);
+            $this->em->flush();
 
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $output->writeln('Super admin created.');
+            $output->success('Super admin created.');
+        } catch (\Throwable $throwable) {
+            $output->error($throwable->getMessage());
+        }
 
         return Command::SUCCESS;
     }

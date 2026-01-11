@@ -53,8 +53,19 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		fi
 
 		if [ "$(find ./migrations -iname '*.php' -print -quit)" ]; then
-			php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
-            php bin/console app:init-database
+			echo 'Running database migrations...'
+			MIGRATION_OUTPUT=$(php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing 2>&1) || {
+				echo 'ERROR: Database migration failed!'
+				echo "$MIGRATION_OUTPUT"
+				exit 1
+			}
+			
+			echo 'Initializing database...'
+			INIT_OUTPUT=$(php bin/console app:init-database 2>&1) || {
+				echo 'ERROR: Database initialization failed!'
+				echo "$INIT_OUTPUT"
+				exit 1
+			}
 		fi
 	fi
 
