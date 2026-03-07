@@ -20,7 +20,7 @@ VOLUME /app/var/
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	file \
 	git \
-	&& rm -rf /var/lib/apt/lists/*
+	&& rm -rf /var/lib/apt/lists/*;
 
 RUN set -eux; \
 	install-php-extensions \
@@ -49,7 +49,7 @@ COPY --link frankenphp/Caddyfile /etc/frankenphp/Caddyfile
 
 ENTRYPOINT ["docker-entrypoint"]
 
-HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
+HEALTHCHECK --start-period=120s CMD curl -f http://localhost:2019/metrics || exit 1
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
 
 # Dev FrankenPHP image
@@ -59,7 +59,7 @@ ENV APP_ENV=dev
 ENV XDEBUG_MODE=off
 ENV FRANKENPHP_WORKER_CONFIG=watch
 
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini";
 
 RUN set -eux; \
 	install-php-extensions \
@@ -79,17 +79,30 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 
+# Install Node.js for TypeScript compilation
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*;
+
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
 RUN set -eux; \
-	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress;
+
+# Copy package.json first for better layer caching
+COPY --link package*.json ./
+COPY --link tsconfig*.json ./
+RUN npm ci;
 
 # copy sources
 COPY --link --exclude=frankenphp/ . ./
 
 RUN set -eux; \
+    npm run ts:build; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer dump-env prod; \
-	# composer run-script --no-dev post-install-cmd; \
+    php bin/console asset-map:compile; \
+    php bin/console assets:install; \
 	chmod +x bin/console; sync;

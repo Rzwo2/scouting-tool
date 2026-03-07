@@ -6,7 +6,7 @@ services:
       - ./.env
       - ./.env.local
     healthcheck:
-      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u$MARIADB_USER -p\"$MARIADB_PASSWORD\""]
+      test: ["CMD-SHELL", "mariadb-admin ping -h $SERVER_NAME -u$MARIADB_USER -p\"$MARIADB_PASSWORD\""]
       timeout: 5s
       retries: 5
       start_period: 60s

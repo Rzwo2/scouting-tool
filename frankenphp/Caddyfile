@@ -3,6 +3,8 @@
 
 	{$CADDY_GLOBAL_OPTIONS}
 
+    cert_issuer internal
+
 	frankenphp {
 		{$FRANKENPHP_CONFIG}
 
