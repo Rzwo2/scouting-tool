@@ -33,19 +33,18 @@ class RegistrationService
     public function createOrUpdateInvitation(string $email): ?RegistrationInvitation
     {
         $invitation = $this->invitationRepository->findOneBy(['email' => $email]);
-        if (!$invitation->isExpired()) {
-            return null;
-        }
 
         if (!$invitation) {
             $invitation = (new RegistrationInvitation())
-                ->setEmail($email);
+                ->setEmail($email)
+                ->setToken($this->generateToken())
+                ->setExpiresAt(new \DateTimeImmutable('+24 hours'));
             $this->entityManager->persist($invitation);
+        } elseif ($invitation->isExpired()) {
+            $invitation
+                ->setToken($this->generateToken())
+                ->setExpiresAt(new \DateTimeImmutable('+24 hours'));
         }
-
-        $invitation
-            ->setToken($this->generateToken())
-            ->setExpiresAt(new \DateTimeImmutable('+24 hours'));
 
         return $invitation;
     }

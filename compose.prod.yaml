@@ -5,5 +5,7 @@ services:
     build:
       context: .
       target: frankenphp_prod
+    volumes:
+      - ./:/app
     environment:
       APP_SECRET: ${APP_SECRET}
