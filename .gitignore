@@ -24,7 +24,6 @@
 ###> symfony/asset-mapper ###
 /public/assets/
 /assets/vendor/
-/assets/js-compiled/
 ###< symfony/asset-mapper ###
 
 ###> docker ###

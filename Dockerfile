@@ -79,30 +79,16 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 
-# Install Node.js for TypeScript compilation
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    nodejs \
-    npm \
-    && rm -rf /var/lib/apt/lists/*;
-
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
 RUN set -eux; \
 	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress;
 
-# Copy package.json first for better layer caching
-COPY --link package*.json ./
-COPY --link tsconfig*.json ./
-RUN npm ci;
-
 # copy sources
 COPY --link --exclude=frankenphp/ . ./
 
 RUN set -eux; \
-    npm run ts:build; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer dump-env prod; \
-    php bin/console asset-map:compile; \
-    php bin/console assets:install; \
 	chmod +x bin/console; sync;

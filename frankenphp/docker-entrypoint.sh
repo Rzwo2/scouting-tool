@@ -59,7 +59,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 				echo "$MIGRATION_OUTPUT"
 				exit 1
 			}
-			
+
 			echo 'Initializing database...'
 			INIT_OUTPUT=$(php bin/console app:init-database 2>&1) || {
 				echo 'ERROR: Database initialization failed!'
@@ -67,6 +67,9 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 				exit 1
 			}
 		fi
+
+        php bin/console asset-map:compile
+        php bin/console assets:install
 	fi
 
 	echo 'PHP app ready!'
