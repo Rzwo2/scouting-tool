@@ -17,8 +17,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\HiddenField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /** @extends AbstractCrudController<RegistrationInvitation> */
@@ -30,6 +32,7 @@ class RegistrationInvitationCrudController extends AbstractCrudController
         private readonly MailerInterface $mailer,
         private readonly UrlGeneratorInterface $url,
         private readonly EntityManagerInterface $entityManager,
+        #[Autowire(env: 'ZIH_SENDER')] private readonly string $sender,
     ) {}
 
     public static function getEntityFqcn(): string
@@ -149,9 +152,9 @@ class RegistrationInvitationCrudController extends AbstractCrudController
 
     private function sendMail(RegistrationInvitation $invitation): void
     {
-        $url = $this->url->generate('register', ['token' => $invitation->getEmail()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->url->generate('app_register', ['token' => $invitation->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
         $email = (new TemplatedEmail())
-            ->from('noreply@scouting-tool.de')
+            ->from(new Address($this->sender, 'Scouting App'))
             ->to($invitation->getEmail())
             ->subject('Einladungslink Scouting Tool')
             ->htmlTemplate('emails/registration_invitation.html.twig')

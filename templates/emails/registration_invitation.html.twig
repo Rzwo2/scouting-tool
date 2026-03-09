@@ -1,82 +1,97 @@
+{% trans_default_domain 'emails' %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ locale|default('en') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>You're invited to join {{ appName }}</title>
+    <title>{{ 'invitation.subject'|trans({'%appName%': appName}) }}</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 16px;
             line-height: 1.6;
-            color: #333;
-            background-color: #f4f4f4;
+            color: #f2f2f2;
+            background: radial-gradient(#950518, #000000e6);
             margin: 0;
-            padding: 0;
+            padding: 20px 0;
+            -webkit-font-smoothing: antialiased;
         }
         .email-container {
             max-width: 600px;
             margin: 40px auto;
-            background-color: #ffffff;
-            border-radius: 8px;
+            background-color: #171717;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 16px #000000cc;
+            border: 1px solid #474747;
         }
         .email-header {
-            background-color: #007bff;
-            color: #ffffff;
+            background-color: #cc0019;
+            color: #f2f2f2;
             padding: 30px 20px;
             text-align: center;
+            border-bottom: 2px solid #950518;
         }
         .email-header h1 {
             margin: 0;
             font-size: 24px;
             font-weight: 600;
+            letter-spacing: 0.01em;
         }
         .email-body {
             padding: 40px 30px;
+            background-color: #171717;
         }
         .email-body p {
             margin: 0 0 20px 0;
             font-size: 16px;
-            color: #555;
+            color: #b0b0b0;
+        }
+        .email-body p strong {
+            color: #f2f2f2;
         }
         .cta-button {
             display: inline-block;
-            background-color: #007bff;
-            color: #ffffff !important;
+            background-color: #cc0019;
+            color: #f2f2f2 !important;
             text-decoration: none;
-            padding: 14px 32px;
-            border-radius: 6px;
-            font-weight: 600;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: bold;
             font-size: 16px;
             margin: 20px 0;
             text-align: center;
-        }
-        .cta-button:hover {
-            background-color: #0056b3;
+            border: 1px solid #950518;
+            box-shadow: 0 4px 8px #00000066;
         }
         .button-container {
             text-align: center;
         }
         .info-box {
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
+            background-color: #1e1e1e;
+            border-left: 4px solid #cc0019;
             padding: 15px 20px;
             margin: 20px 0;
             border-radius: 4px;
+            border-top: 1px solid #2e2e2e;
+            border-right: 1px solid #2e2e2e;
+            border-bottom: 1px solid #2e2e2e;
         }
         .info-box p {
             margin: 5px 0;
             font-size: 14px;
-            color: #666;
+            color: #b0b0b0;
+        }
+        .info-box p strong {
+            color: #f2f2f2;
         }
         .email-footer {
-            background-color: #f8f9fa;
+            background-color: #101010;
             padding: 20px 30px;
             text-align: center;
             font-size: 14px;
-            color: #777;
-            border-top: 1px solid #e0e0e0;
+            color: #b0b0b0;
+            border-top: 1px solid #2e2e2e;
         }
         .email-footer p {
             margin: 5px 0;
@@ -84,48 +99,58 @@
         .alternative-link {
             margin-top: 20px;
             padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            border: 1px solid #2e2e2e;
             word-break: break-all;
             font-size: 12px;
-            color: #666;
+            color: #b0b0b0;
+        }
+        .alternative-link p strong {
+            color: #f2f2f2;
         }
     </style>
 </head>
 <body>
     <div class="email-container">
+
         <div class="email-header">
-            <h1>You're Invited!</h1>
+            <h1>{{ 'invitation.headline'|trans }}</h1>
         </div>
 
         <div class="email-body">
-            <p>Hello,</p>
-
-            <p>You've been invited to join <strong>{{ appName }}</strong>.</p>
-
-            <p>Click the button below to create your account and get started:</p>
+            <p>{{ 'invitation.greeting'|trans }}</p>
+            <p>{{ 'invitation.body'|trans({'%appName%': appName})|raw }}</p>
+            <p>{{ 'invitation.cta_intro'|trans }}</p>
 
             <div class="button-container">
-                <a href="{{ registrationUrl }}" class="cta-button">Create Your Account</a>
+                <a href="{{ registrationUrl }}" class="cta-button">
+                    {{ 'invitation.cta_button'|trans }}
+                </a>
             </div>
 
             <div class="info-box">
-                <p><strong>⏰ Important:</strong></p>
-                <p>This invitation will expire on <strong>{{ expiresAt|date('F j, Y') }}</strong> at <strong>{{ expiresAt|date('g:i A') }}</strong> (in 24 hours).</p>
+                <p><strong>{{ 'invitation.expiry_heading'|trans }}</strong></p>
+                <p>{{ 'invitation.expiry_body'|trans({
+                    '%date%': expiresAt|date('F j, Y'),
+                    '%time%': expiresAt|date('g:i A')
+                })|raw }}</p>
             </div>
 
-            <p>If you didn't expect this invitation or believe you received this email by mistake, you can safely ignore it.</p>
+            <p>{{ 'invitation.ignore_notice'|trans }}</p>
 
             <div class="alternative-link">
-                <p><strong>If the button doesn't work, copy and paste this link into your browser:</strong></p>
+                <p><strong>{{ 'invitation.fallback_link_heading'|trans }}</strong></p>
                 <p>{{ registrationUrl }}</p>
             </div>
         </div>
 
         <div class="email-footer">
-            <p>© {{ 'now'|date('Y') }} {{ appName }}. All rights reserved.</p>
-            <p>This is an automated message, please do not reply to this email.</p>
+            <p>© {{ 'now'|date('Y') }} {{ appName }}. {{ 'invitation.footer_rights'|trans }}</p>
+            <p>{{ 'invitation.footer_automated'|trans }}</p>
         </div>
+
     </div>
 </body>
 </html>
+

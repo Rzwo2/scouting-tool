@@ -1,0 +1,14 @@
+invitation:
+    subject: "Du wurdest eingeladen, %appName% beizutreten"
+    headline: "Du bist eingeladen!"
+    greeting: "Hallo,"
+    body: "Du wurdest eingeladen, <strong>%appName%</strong> beizutreten."
+    cta_intro: "Klicke auf die Schaltfläche unten, um dein Konto zu erstellen:"
+    cta_button: "Konto erstellen"
+    expiry_heading: "⏰ Wichtiger Hinweis:"
+    expiry_body: "Diese Einladung läuft am <strong>%date%</strong> um <strong>%time%</strong> ab (in 24 Stunden)."
+    ignore_notice: "Falls Du diese Einladung nicht erwartet hast oder glaubst, diese E-Mail irrtümlich erhalten zu haben, kannst Du sie ignorieren."
+    fallback_link_heading: "Falls die Schaltfläche nicht funktioniert, kopiere diesen Link in Deinen Browser:"
+    footer_rights: "Alle Rechte vorbehalten."
+    footer_automated: "Dies ist eine automatisch generierte E-Mail. Bitte antworte nicht auf diese Nachricht."
+

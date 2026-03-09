@@ -11,7 +11,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class RegistrationService
+readonly class RegistrationService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,

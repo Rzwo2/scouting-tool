@@ -1,8 +1,11 @@
+include .env.local
+export
+
 build.dev:
-	docker compose --env-file .env --env-file .env.local build --pull --no-cache
+	sudo docker compose --env-file .env --env-file .env.local build --pull --no-cache
 
 build.prod:
-	docker compose --env-file .env --env-file .env.local -f compose.yaml -f compose.prod.yaml build --pull --no-cache
+	sudo docker compose --env-file .env --env-file .env.local -f compose.yaml -f compose.prod.yaml build --pull --no-cache
 
 up.dev:
 	docker compose --env-file .env --env-file .env.local up --wait
@@ -18,3 +21,9 @@ logs.docker.php:
 
 logs.docker.database:
 	docker compose logs database
+
+bash.php:
+	docker compose exec php bash
+
+bash.database:
+	docker compose exec $(MARIADB_HOST) mariadb --ssl=off -D $(MARIADB_DATABASE) -u $(MARIADB_USER) -p$(MARIADB_PASSWORD)

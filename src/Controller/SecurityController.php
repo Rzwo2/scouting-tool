@@ -40,7 +40,7 @@ class SecurityController extends AbstractController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    #[Route(path: '/register/{token}', name: 'register', requirements: ['token' => Requirement::CATCH_ALL])]
+    #[Route(path: '/register/{token}', name: 'app_register', requirements: ['token' => Requirement::CATCH_ALL])]
     public function register(
         string $token,
         Request $request,
@@ -71,7 +71,6 @@ class SecurityController extends AbstractController
             ]);
         }
 
-        dd($form);
         $registrationService->registerUser($user, $registrationInvitation);
 
         return $this->redirect('app_login');
@@ -81,5 +80,11 @@ class SecurityController extends AbstractController
     public function profileAction(): Response
     {
         return $this->render('security/user-profile.html.twig');
+    }
+
+    #[Route(path: '/email', name: 'app_email', methods: ['GET'])]
+    public function emailViewAction(): Response
+    {
+        return $this->render('emails/registration_invitation.html.twig', ['appName' => 'Scouting', 'registrationUrl' => 'test', 'expiresAt' => new \DateTimeImmutable()]);
     }
 }

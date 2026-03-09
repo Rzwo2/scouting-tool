@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\RegistrationInvitation;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryProxy;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 
-/** @extends ServiceEntityRepositoryProxy<RegistrationInvitation> */
-class RegistrationInvitationRepository extends ServiceEntityRepositoryProxy
+/** @extends ServiceEntityRepository<RegistrationInvitation> */
+class RegistrationInvitationRepository extends ServiceEntityRepository
 {
     use RepositoryTrait;
 
@@ -25,7 +26,7 @@ class RegistrationInvitationRepository extends ServiceEntityRepositoryProxy
             ->andWhere('invitation.expiresAt > :now')
             ->andWhere('invitation.registeredUser IS NULL')
             ->setParameter('token', $token)
-            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('now', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE)
             ->getQuery()->getOneOrNullResult();
     }
 }
