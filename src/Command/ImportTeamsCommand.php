@@ -320,11 +320,8 @@ class PlayerModel
 
 class GameFetchModel
 {
-    public \DateTime $dateTime;
-
     public function __construct(
-        #[SerializedName('Datum')] public string $date,
-        #[SerializedName('Uhrzeit')] public string $time,
+        #[SerializedName('Datum und Uhrzeit')] public \DateTime $dateTime,
         #[SerializedName('#')] public int $gameId,
         #[SerializedName('Mannschaft 1')] public string $team1,
         #[SerializedName('Mannschaft 2')] public string $team2,
@@ -343,7 +340,5 @@ class GameFetchModel
         #[SerializedName('Satz 5 - Ballpunkte 1')] public ?int $set5Points1 = null,
         #[SerializedName('Satz 5 - Ballpunkte 2')] public ?int $set5Points2 = null,
         #[SerializedName('Satz 5 - Satzdauer')] public ?int $set5duration = null,
-    ) {
-        $this->dateTime = new \DateTime("$date $time");
-    }
+    ) {}
 }

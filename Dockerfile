@@ -75,9 +75,15 @@ FROM frankenphp_base AS frankenphp_prod
 
 ENV APP_ENV=prod
 
-RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini";
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*;
 
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
+COPY --link frankenphp/supervisord.conf /etc/supervisor/supervisord.conf
+COPY --link frankenphp/supervisor.d/messenger-worker.conf /etc/supervisor/conf.d/messenger-worker.conf
 
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
