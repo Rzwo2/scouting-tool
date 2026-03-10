@@ -1,6 +1,5 @@
 invitation:
     title: "You're invited to join %appName%"
-    headline: "You´re invited!"
     headline: "You're Invited!"
     greeting: "Hello,"
     body: "You've been invited to join <strong>%appName%</strong>."
