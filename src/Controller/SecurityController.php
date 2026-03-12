@@ -4,17 +4,26 @@ namespace App\Controller;
 
 use App\Domain\Registration\RegistrationService;
 use App\Entity\User;
+use App\Form\Security\ChangePasswordForm;
+use App\Form\Security\ChangeUsernameForm;
 use App\Form\Security\RegisterForm;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    public function __construct(
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly EntityManagerInterface $entityManager,
+    ) {}
+
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -79,7 +88,71 @@ class SecurityController extends AbstractController
     #[Route(path: '/profile', name: 'app_profile', methods: [Request::METHOD_GET])]
     public function profileAction(): Response
     {
-        return $this->render('security/user-profile.html.twig');
+        return $this->render('security/user-profile.html.twig', [
+            'usernameForm' => $this->createForm(ChangeUsernameForm::class),
+            'passwordForm' => $this->createForm(ChangePasswordForm::class),
+        ]);
+    }
+
+    #[Route(path: '/profile/username', name: 'app_profile_change_username', methods: [Request::METHOD_POST])]
+    public function changeUsernameAction(Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $form = $this->createForm(ChangeUsernameForm::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $currentPassword = $form->get('currentPassword')->getData();
+
+            if (!$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
+                $this->addFlash('error', 'Das aktuelle Passwort ist falsch.');
+
+                return $this->redirectToRoute('app_profile');
+            }
+
+            $user->setUsername($form->getData()['newUsername']);
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Benutzername erfolgreich geändert.');
+        } else {
+            foreach ($form->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
+
+        return $this->redirectToRoute('app_profile');
+    }
+
+    #[Route(path: '/profile/password', name: 'app_profile_change_password', methods: [Request::METHOD_POST])]
+    public function changePasswordAction(Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $form = $this->createForm(ChangePasswordForm::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $currentPassword = $form->get('currentPassword')->getData();
+            $newPassword = $form->get('newPassword')->getData();
+
+            if (!$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
+                $this->addFlash('error', 'Das aktuelle Passwort ist falsch.');
+
+                return $this->redirectToRoute('app_profile');
+            }
+
+            $user->setPassword($this->passwordHasher->hashPassword($user, $newPassword));
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Passwort geändert. Bitte melde dich erneut an.');
+
+            return $this->redirectToRoute('app_login');
+        }
+
+        foreach ($form->getErrors(true) as $error) {
+            $this->addFlash('error', $error->getMessage());
+        }
+
+        return $this->redirectToRoute('app_profile');
     }
 
     #[Route(path: '/email', name: 'app_email', methods: ['GET'])]

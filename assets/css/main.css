@@ -16,6 +16,30 @@ nav#nav-top {
 
     #profile {
         justify-self: right;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-s);
+    }
+}
+
+.nav-icon {
+    color: var(--text-on-primary);
+    opacity: 0.8;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xs);
+
+    &:hover {
+        opacity: 1;
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    &.nav-icon--active {
+        opacity: 1;
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    svg {
+        display: block;
     }
 }
 

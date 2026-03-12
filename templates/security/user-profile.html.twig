@@ -5,21 +5,69 @@
 {%- block headline -%}Profil{%- endblock -%}
 
 {% block main %}
-<section class="overview">
-  <div class="property">Benutzername</div>
-  <div class="value">{{ app.user.username }}</div>
-  <div class="property">Email-Adresse</div>
-  <div class="value">{{ app.user.email }}</div>
-</section>
-<button id="change-password">Passwort ändern</button>
+<div class="profile-page">
+
+    <section class="profile-section">
+        <h2>Kontoinformationen</h2>
+        <div class="overview-grid">
+            <span class="property">Benutzername</span>
+            <span class="value">{{ app.user.username }}</span>
+            <span class="property">Email-Adresse</span>
+            <span class="value">{{ app.user.email }}</span>
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <h2>Benutzername ändern</h2>
+        {{ form_start(usernameForm, {action: path('app_profile_change_username'), method: 'POST'}) }}
+        {{ form_widget(usernameForm) }}
+        {{ form_end(usernameForm) }}
+    </section>
+
+    <section class="profile-section">
+        <h2>Passwort ändern</h2>
+        {{ form_start(passwordForm, {action: path('app_profile_change_password'), method: 'POST'}) }}
+        {{ form_widget(passwordForm) }}
+        {{ form_end(passwordForm) }}
+    </section>
+
+</div>
 {% endblock main %}
 
 {% block stylesheets %}
-{{parent()}}
+{{ parent() }}
 <style>
-.overview{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.profile-page {
+    display: grid;
+    gap: var(--spacing-l);
+    max-width: 600px;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-s);
+    margin-bottom: var(--spacing);
+}
+
+.overview-grid .property {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.profile-section {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-l);
+}
+
+.profile-section h2 {
+    margin-bottom: var(--spacing);
+    color: var(--text-muted);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 </style>
 {% endblock stylesheets %}

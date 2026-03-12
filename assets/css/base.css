@@ -305,3 +305,21 @@ img {
     margin: 0;
     padding: 0;
 }
+
+dialog {
+    padding: var(--spacing-l);
+    border-radius: var(--radius-md);
+    background-color: var(--bg);
+    color: var(--text);
+    outline: none;
+    border: 1px solid var(--text-muted);
+
+    header {
+        padding-bottom: var(--spacing-l);
+    }
+
+    &::backdrop {
+        backdrop-filter: blur(2px);
+        background-color: rgba(0 0 0 /.5);
+    }
+}

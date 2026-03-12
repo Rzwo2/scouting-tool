@@ -2,11 +2,6 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Game;
-use App\Entity\Player;
-use App\Entity\RegistrationInvitation;
-use App\Entity\Team;
-use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -40,10 +35,11 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToCrud('Benutzer', 'fas fa-list', User::class);
-        yield MenuItem::linkToCrud('Team', 'fas fa-list', Team::class);
-        yield MenuItem::linkToCrud('Spieler', 'fas fa-list', Player::class);
-        yield MenuItem::linkToCrud('Spiele', 'fas fa-list', Game::class);
-        yield MenuItem::linkToCrud('Registrierung', 'fas fa-list', RegistrationInvitation::class);
+        yield MenuItem::linkToUrl('Statistik', 'fas fa-chart-bar', '/statistic');
+        yield MenuItem::linkTo(RegistrationInvitationCrudController::class, 'Registrierung', 'fas fa-list');
+        yield MenuItem::linkTo(UserCrudController::class, 'Benutzer', 'fas fa-list');
+        yield MenuItem::linkTo(TeamCrudController::class, 'Team', 'fas fa-list');
+        yield MenuItem::linkTo(PlayerCrudController::class, 'Spieler', 'fas fa-list');
+        yield MenuItem::linkTo(GameCrudController::class, 'Spiele', 'fas fa-list');
     }
 }
