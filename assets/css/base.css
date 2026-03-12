@@ -288,6 +288,10 @@ select {
     &:active {
         background-color: var(--bg-light);
     }
+
+    &:disabled {
+        background-color: var(--bg-lighter);
+    }
 }
 
 /* ### TAGS ### */
@@ -309,17 +313,64 @@ img {
 dialog {
     padding: var(--spacing-l);
     border-radius: var(--radius-md);
-    background-color: var(--bg);
+    background-color: var(--bg-light);
     color: var(--text);
     outline: none;
-    border: 1px solid var(--text-muted);
+    border: 1px solid var(--border);
+    min-width: min(500px, 90vw);
 
     header {
-        padding-bottom: var(--spacing-l);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--spacing);
+    }
+
+    .dialog-close {
+        background: none;
+        border: none;
+        box-shadow: none;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+
+        &:hover {
+            color: var(--text);
+        }
+    }
+
+    select {
+        width: 100%;
     }
 
     &::backdrop {
         backdrop-filter: blur(2px);
         background-color: rgba(0 0 0 /.5);
+    }
+}
+
+section {
+    display: grid;
+    gap: var(--spacing);
+    width: max-content;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-l);
+    margin: var(--spacing) auto;
+
+    h2 {
+        color: var(--text-muted);
+    }
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    gap: var(--spacing);
+    margin: var(--spacing) 0;
+
+    .property {
+        color: var(--text-muted)
     }
 }

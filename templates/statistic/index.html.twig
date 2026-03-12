@@ -9,7 +9,10 @@
 {% block main %}
 {% if is_granted('ROLE_ADMIN') %}
     <dialog id="import-dialog">
-        <header><h2>Statistik Import</h2></header>
+        <header>
+            <h2>Statistik Import</h2>
+            <button type="button" class="dialog-close" aria-label="Schließen">&times;</button>
+        </header>
         <article>{{ component('StatisticImportForm', {formData: formData, form: form}) }}</article>
     </dialog>
     <button id='import-button' style="float:right;">IMPORT</button>

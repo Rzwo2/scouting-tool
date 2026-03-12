@@ -5,69 +5,61 @@
 {%- block headline -%}Profil{%- endblock -%}
 
 {% block main %}
-<div class="profile-page">
+<section class="profile-section">
+    <h2>Kontoinformationen</h2>
+    <div class="overview-grid">
+        <span class="property">Benutzername</span>
+        <span class="value">{{ app.user.username }}</span>
+        <span class="property">Email-Adresse</span>
+        <span class="value">{{ app.user.email }}</span>
+    </div>
+    <div class="profile-actions">
+        <button type="button" id="btn-username">Benutzername ändern</button>
+        <button type="button" id="btn-password">Passwort ändern</button>
+    </div>
+</section>
 
-    <section class="profile-section">
-        <h2>Kontoinformationen</h2>
-        <div class="overview-grid">
-            <span class="property">Benutzername</span>
-            <span class="value">{{ app.user.username }}</span>
-            <span class="property">Email-Adresse</span>
-            <span class="value">{{ app.user.email }}</span>
-        </div>
-    </section>
-
-    <section class="profile-section">
+<dialog id="dialog-username">
+    <header>
         <h2>Benutzername ändern</h2>
-        {{ form_start(usernameForm, {action: path('app_profile_change_username'), method: 'POST'}) }}
-        {{ form_widget(usernameForm) }}
-        {{ form_end(usernameForm) }}
-    </section>
+        <button type="button" class="dialog-close" aria-label="Schließen">&times;</button>
+    </header>
+    {{ form_start(usernameForm, {action: path('app_profile_change_username'), method: 'POST'}) }}
+    {{ form_widget(usernameForm) }}
+    {{ form_end(usernameForm) }}
+</dialog>
 
-    <section class="profile-section">
+<dialog id="dialog-password">
+    <header>
         <h2>Passwort ändern</h2>
-        {{ form_start(passwordForm, {action: path('app_profile_change_password'), method: 'POST'}) }}
-        {{ form_widget(passwordForm) }}
-        {{ form_end(passwordForm) }}
-    </section>
+        <button type="button" class="dialog-close" aria-label="Schließen">&times;</button>
+    </header>
+    {{ form_start(passwordForm, {action: path('app_profile_change_password'), method: 'POST'}) }}
+    {{ form_widget(passwordForm) }}
+    {{ form_end(passwordForm) }}
+</dialog>
 
-</div>
+<script>
+document.addEventListener('turbo:load', function () {
+    function bindDialog(btnId, dialogId) {
+        const btn = document.getElementById(btnId);
+        const dialog = document.getElementById(dialogId);
+        if (!btn || !dialog) return;
+
+        btn.addEventListener('click', () => dialog.showModal());
+
+        dialog.querySelectorAll('.dialog-close').forEach(function (closeBtn) {
+            closeBtn.addEventListener('click', () => dialog.close());
+        });
+
+        dialog.addEventListener('click', function (e) {
+            if (e.target === dialog) dialog.close();
+        });
+    }
+
+    bindDialog('btn-username', 'dialog-username');
+    bindDialog('btn-password', 'dialog-password');
+});
+</script>
 {% endblock main %}
 
-{% block stylesheets %}
-{{ parent() }}
-<style>
-.profile-page {
-    display: grid;
-    gap: var(--spacing-l);
-    max-width: 600px;
-}
-
-.overview-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-s);
-    margin-bottom: var(--spacing);
-}
-
-.overview-grid .property {
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.profile-section {
-    background-color: var(--bg-light);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-l);
-}
-
-.profile-section h2 {
-    margin-bottom: var(--spacing);
-    color: var(--text-muted);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-</style>
-{% endblock stylesheets %}
