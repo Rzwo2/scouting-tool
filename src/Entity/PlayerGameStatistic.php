@@ -16,6 +16,9 @@ class PlayerGameStatistic
     #[ORM\Column]
     private int $id;
 
+    #[ORM\Column(length: 50, unique: true, index: true)]
+    private string $balltimeId;
+
     #[ORM\ManyToOne(inversedBy: 'playerGameStatistics')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
     private Player $player;
@@ -93,6 +96,18 @@ class PlayerGameStatistic
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getBalltimeId(): string
+    {
+        return $this->balltimeId;
+    }
+
+    public function setBalltimeId(string $balltimeId): static
+    {
+        $this->balltimeId = $balltimeId;
+
+        return $this;
     }
 
     public function getPlayer(): ?Player

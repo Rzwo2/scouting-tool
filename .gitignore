@@ -29,3 +29,6 @@
 ###> docker ###
 /docker/
 ###< docker ###
+
+
+/src/**/*[Tt]est*
