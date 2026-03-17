@@ -5,7 +5,7 @@
 {%- block headline -%}Profil{%- endblock -%}
 
 {% block main %}
-<section class="profile-section">
+<article class="profile-section">
     <h2>Kontoinformationen</h2>
     <div class="overview-grid">
         <span class="property">Benutzername</span>
@@ -14,52 +14,30 @@
         <span class="value">{{ app.user.email }}</span>
     </div>
     <div class="profile-actions">
-        <button type="button" id="btn-username">Benutzername ändern</button>
-        <button type="button" id="btn-password">Passwort ändern</button>
+        <button type="button" commandfor="dialog-username" command="show-modal">Benutzername ändern</button>
+        <button type="button" commandfor="dialog-password" command="show-modal">Passwort ändern</button>
     </div>
-</section>
+</article>
 
-<dialog id="dialog-username">
+<dialog id="dialog-username" closedBy="any">
     <header>
         <h2>Benutzername ändern</h2>
-        <button type="button" class="dialog-close" aria-label="Schließen">&times;</button>
+        <button type="button" class="dialog-close" aria-label="Schließen" commandfor="dialog-username" command="close">&times;</button>
     </header>
     {{ form_start(usernameForm, {action: path('app_profile_change_username'), method: 'POST'}) }}
     {{ form_widget(usernameForm) }}
     {{ form_end(usernameForm) }}
 </dialog>
 
-<dialog id="dialog-password">
+<dialog id="dialog-password" closedBy="any">
     <header>
         <h2>Passwort ändern</h2>
-        <button type="button" class="dialog-close" aria-label="Schließen">&times;</button>
+        <button type="button" class="dialog-close" aria-label="Schließen" commandfor="dialog-password" command="close">&times;</button>
     </header>
     {{ form_start(passwordForm, {action: path('app_profile_change_password'), method: 'POST'}) }}
     {{ form_widget(passwordForm) }}
     {{ form_end(passwordForm) }}
 </dialog>
 
-<script>
-document.addEventListener('turbo:load', function () {
-    function bindDialog(btnId, dialogId) {
-        const btn = document.getElementById(btnId);
-        const dialog = document.getElementById(dialogId);
-        if (!btn || !dialog) return;
-
-        btn.addEventListener('click', () => dialog.showModal());
-
-        dialog.querySelectorAll('.dialog-close').forEach(function (closeBtn) {
-            closeBtn.addEventListener('click', () => dialog.close());
-        });
-
-        dialog.addEventListener('click', function (e) {
-            if (e.target === dialog) dialog.close();
-        });
-    }
-
-    bindDialog('btn-username', 'dialog-username');
-    bindDialog('btn-password', 'dialog-password');
-});
-</script>
 {% endblock main %}
 

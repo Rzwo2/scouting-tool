@@ -12,6 +12,15 @@ function initializePage() {
             importDialog.close();
         }
     });
+    const $bulkImportButton = $('#bulk-import-button');
+    const $bulkImportDialog = $('#bulk-import-dialog');
+    const bulkImportDialog = $bulkImportDialog.get(0);
+    $bulkImportButton.off('click').on('click', () => bulkImportDialog?.showModal());
+    $bulkImportDialog.off('click').on('click', (event) => {
+        if (event.target == bulkImportDialog) {
+            bulkImportDialog.close();
+        }
+    });
     if ($dataTable !== null) {
         $dataTable.destroy();
     }
@@ -46,16 +55,6 @@ function initializePage() {
             <th colspan=7>Angriff</th>
             <th>Block</th>
         </tr>`));
-    // const tableScroll: null | HTMLDivElement = document.querySelector('.dt-scroll');
-    // if (tableScroll) {
-    //     tableScroll.addEventListener('mousemove', function (e: MouseEvent) {
-    //         const rect = this.getBoundingClientRect();
-    //         const scrollBody: null | HTMLElement = this.querySelector('.dt-scroll-body');
-    //         if (scrollBody) {
-    //             scrollBody.scrollLeft = Math.round((e.pageX - rect.x - rect.width / 4) * 100 / (rect.width / 2));
-    //         }
-    //     });
-    // }
     DatatablesHelper.addOnChangeEventForColumn($dataTable.column(`team:name`), $('#select-team'), true);
     DatatablesHelper.addOnChangeEventForColumn($dataTable.column(`game:name`), $('#select-game'), true);
 }

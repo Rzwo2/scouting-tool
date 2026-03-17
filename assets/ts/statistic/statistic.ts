@@ -8,17 +8,6 @@ let $dataTable: Api<any> | null = null;
 document.addEventListener('turbo:load', initializePage);
 
 function initializePage() {
-    const $importButton: JQuery = $('#import-button');
-    const $importDialog: JQuery = $('#import-dialog');
-    const importDialog = $importDialog.get(0) as HTMLDialogElement;
-    $importButton.off('click').on('click', () => importDialog.showModal());
-
-    $importDialog.off('click').on('click', (event) => {
-        if (event.target == importDialog) {
-            importDialog.close();
-        }
-    });
-
     if ($dataTable !== null) {
         $dataTable.destroy();
     }

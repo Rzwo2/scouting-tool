@@ -349,7 +349,7 @@ dialog {
     }
 }
 
-section {
+article {
     display: grid;
     gap: var(--spacing);
     width: max-content;
@@ -362,6 +362,10 @@ section {
     h2 {
         color: var(--text-muted);
     }
+}
+
+section {
+    margin-bottom: var(--spacing-s);
 }
 
 .overview-grid {

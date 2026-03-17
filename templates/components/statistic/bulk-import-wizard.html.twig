@@ -1,0 +1,96 @@
+<div {{ attributes }}>
+    {% if errorMessage %}
+        <p class="text-danger"><strong>Fehler:</strong> {{ errorMessage }}</p>
+    {% endif %}
+
+    {% if step == 'idle' %}
+        <p>Klicke auf „Laden", um die Balltime Videobibliothek abzurufen.</p>
+        <button type="button"
+                data-action="live#action"
+                data-live-action-param="loadVideos">Laden</button>
+
+    {% elseif step == 'folder_select' %}
+        <section class="mb-3">
+            <label for="bulk-folder-select">Ordner</label>
+            <select id="bulk-folder-select" data-model="selectedFolderId">
+                <option value="">-- Wähle einen Ordner aus --</option>
+                {% for id, name in folders %}
+                    <option value="{{ id }}"
+                            {% if id == selectedFolderId %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </section>
+        <button type="button"
+                data-action="live#action"
+                data-live-action-param="confirmFolderSelection"
+                {% if not selectedFolderId %}disabled{% endif %}>Auswählen</button>
+
+    {% elseif step == 'conflict_resolve' %}
+        {% set conflict = conflicts[currentConflictIndex] %}
+        {% set remaining = conflicts|length - currentConflictIndex %}
+        <section>
+            <p><strong>{{ conflict.title }}</strong></p>
+            <p>Vorhandener Eintrag: {{ conflict.entryDescription }}</p>
+            <p>Es gibt für dieses Video bereits einen Eintrag. Soll dieser überschrieben werden?</p>
+        </section>
+        <div class="button-group">
+            <button type="button"
+                    data-action="live#action"
+                    data-live-action-param="resolveConflict"
+                    data-live-decision-param="yes">Ja</button>
+            <button type="button"
+                    data-action="live#action"
+                    data-live-action-param="resolveConflict"
+                    data-live-decision-param="yes_all">Ja, Alle weiteren ({{ remaining }})</button>
+            <button type="button"
+                    data-action="live#action"
+                    data-live-action-param="resolveConflict"
+                    data-live-decision-param="no">Nein</button>
+            <button type="button"
+                    data-action="live#action"
+                    data-live-action-param="resolveConflict"
+                    data-live-decision-param="no_all">Nein, Alle weiteren ({{ remaining }})</button>
+        </div>
+
+    {% elseif step == 'video_mapping' %}
+        {% if videoMappings|length == 0 %}
+            <p>Keine neuen Videos zum Importieren.</p>
+        {% else %}
+            {% set allTeams = this.allTeams %}
+            {% set gamesByTeamId = this.gamesByTeamId %}
+            <article id="bulk-import-mappings" style="overflow-y:scroll; max-height: 80vh;">
+                {% for i, mapping in videoMappings %}
+                    <div class="bulk-import-row">
+                        <span class="bulk-import-video-title">{{ mapping.title }}</span>
+                        <select data-model="videoMappings.{{ i }}.teamId">
+                            <option value="">Wähle ein Team aus</option>
+                            {% for team in allTeams %}
+                                <option value="{{ team.id }}"
+                                        {% if team.id == mapping.teamId %}selected{% endif %}>
+                                    {{ team.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <select data-model="videoMappings.{{ i }}.gameId"
+                                {% if not mapping.teamId %}disabled{% endif %}>
+                            <option value="">Wähle ein Spiel</option>
+                            {% if mapping.teamId %}
+                                {% for game in (gamesByTeamId[mapping.teamId] ?? []) %}
+                                    <option value="{{ game.id }}"
+                                            {% if game.id == mapping.gameId %}selected{% endif %}>
+                                        {{ game.name }}
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                {% endfor %}
+            </article>
+            <button type="button"
+                    data-action="live#action:prevent"
+                    data-live-action-param="executeImport">Bestätigen</button>
+        {% endif %}
+    {% endif %}
+</div>

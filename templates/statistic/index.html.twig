@@ -11,11 +11,19 @@
     <dialog id="import-dialog">
         <header>
             <h2>Statistik Import</h2>
-            <button type="button" class="dialog-close" aria-label="Schließen">&times;</button>
+            <button type="button" class="dialog-close" aria-label="Schließen" commandfor="import-dialog" command="close">&times;</button>
         </header>
         <article>{{ component('StatisticImportForm', {formData: formData, form: form}) }}</article>
     </dialog>
-    <button id='import-button' style="float:right;">IMPORT</button>
+    <dialog id="bulk-import-dialog">
+        <header>
+            <h2>Bulk Import</h2>
+            <button type="button" class="dialog-close" aria-label="Schließen" commandfor="bulk-import-dialog" command="close">&times;</button>
+        </header>
+        {{ component('BulkImportWizard') }}
+    </dialog>
+    <button type="button" style="float:right" commandfor="bulk-import-dialog" command="show-modal">Bulk Import</button>
+    <button type="button" style="float:right" commandfor="import-dialog" command="show-modal">IMPORT</button>
 {% endif %}
 
 {{component('StatisticOverviewController')}}

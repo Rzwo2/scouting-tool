@@ -42,6 +42,29 @@ class PlayerGameStatisticRepository extends ServiceEntityRepository
             ->getQuery()->getResult();
     }
 
+    /**
+     * Returns the first PlayerGameStatistic found for each balltimeId, keyed by balltimeId.
+     *
+     * @param string[] $balltimeIds
+     *
+     * @return array<string, PlayerGameStatistic>
+     */
+    public function findByBalltimeIds(array $balltimeIds): array
+    {
+        if (!$balltimeIds) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('stat', 'stat.balltimeId')
+            ->innerJoin('stat.game', 'game')
+            ->innerJoin('game.teamOne', 'team1')
+            ->innerJoin('game.teamTwo', 'team2')
+            ->where('stat.balltimeId IN (:ids)')
+            ->setParameter('ids', $balltimeIds)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getQueryForStatisticDataByAjaxData(AjaxData $ajaxData): QueryBuilder
     {
         $model = StatisticModel::class;

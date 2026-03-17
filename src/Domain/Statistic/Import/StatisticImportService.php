@@ -38,6 +38,98 @@ readonly class StatisticImportService
         private RequestStack $requestStack,
     ) {}
 
+    /**
+     * @param ImportTypeModel[] $importTypeDtoList
+     */
+    public function handleBulkImport(array $importTypeDtoList): void
+    {
+        if (!$importTypeDtoList) {
+            return;
+        }
+
+        $allNotFoundNumbers = [];
+        $allPlayerStatsPerItem = [];
+
+        // Collect all player-stats from Balltime API first (no DB writes yet)
+        foreach ($importTypeDtoList as $index => $importTypeDto) {
+            if (!($team = $importTypeDto->team) || !($game = $importTypeDto->game) || null === $importTypeDto->videoId) {
+                throw new \UnexpectedValueException('Da stimmt was mit dem Formular nicht. Kontaktiere einen Admin');
+            }
+
+            $allPlayerStatsPerItem[$index] = [
+                'item' => $importTypeDto,
+                'sideOut1' => $this->getPlayerStatsModelsFromResponse($this->sendRequest($importTypeDto->videoId, isFirstBallSideOut: true)),
+                'sideOut0' => $this->getPlayerStatsModelsFromResponse($this->sendRequest($importTypeDto->videoId, isFirstBallSideOut: false)),
+            ];
+        }
+
+        // Pre-load all existing PlayerGameStatistic records per game/team in one query each
+        $existingPerItem = [];
+        foreach ($importTypeDtoList as $index => $importTypeDto) {
+            $existingPerItem[$index] = array_column(
+                array: $this->playerGameStatisticRepository->findImportIndexAndEntityByGameAndTeam($importTypeDto->game, $importTypeDto->team),
+                column_key: 'playerGameStat',
+                index_key: 'index',
+            );
+        }
+
+        // Persist all entities without flushing
+        foreach ($allPlayerStatsPerItem as $index => $data) {
+            /** @var ImportTypeModel $item */
+            $importTypeDto = $data['item'];
+            $existing = $existingPerItem[$index];
+
+            foreach ([true, false] as $isFirstBallSideOut) {
+                $playerStatsModels = $isFirstBallSideOut ? $data['sideOut1'] : $data['sideOut0'];
+                $players = $this->playerRepository->findByTeamAndPlayerNumbersIndexedByNumber(
+                    $importTypeDto->team,
+                    array_column($playerStatsModels, 'jerseyNumber'),
+                );
+
+                foreach ($playerStatsModels as $playerStatsModel) {
+                    if (null === $player = $players[$playerStatsModel->jerseyNumber] ?? null) {
+                        $allNotFoundNumbers[] = $playerStatsModel->jerseyNumber;
+                        continue;
+                    }
+
+                    $idx = sprintf('%d|%d|%d', $player->getId(), $importTypeDto->game->getId(), (int) $isFirstBallSideOut);
+
+                    /** @var PlayerGameStatistic $playerGameStatistic */
+                    $playerGameStatistic = $existing[$idx] ?? new PlayerGameStatistic();
+                    $this->objectNormalizer->denormalize($playerStatsModel, PlayerGameStatistic::class, null, ['object_to_populate' => $playerGameStatistic]);
+
+                    if (!isset($existing[$idx])) {
+                        $playerGameStatistic
+                            ->setIsFirstBallSideOut($isFirstBallSideOut)
+                            ->setPlayer($player)
+                            ->setGame($importTypeDto->game)
+                            ->setBalltimeId($importTypeDto->videoId);
+
+                        $this->entityManager->persist($playerGameStatistic);
+                    }
+                }
+            }
+        }
+
+        $amountNew = count($this->entityManager->getUnitOfWork()->getScheduledEntityInsertions());
+        $amountUpdated = count($this->entityManager->getUnitOfWork()->getScheduledEntityUpdates());
+
+        $this->entityManager->flush();
+
+        $successMessage = 'Bulk-Import erfolgreich.';
+        if ($amountNew) {
+            $successMessage .= " $amountNew neue Daten importiert.";
+        }
+        if ($amountUpdated) {
+            $successMessage .= " $amountUpdated Daten geupdated.";
+        }
+
+        $this->addSuccessMessage($successMessage);
+        if ($allNotFoundNumbers) {
+            $this->addWarningMessage('nicht gefundene Spieler-Nummern in Datenbank: ' . implode(' | ', $allNotFoundNumbers));
+        }
+    }
+
     public function handleImport(ImportTypeModel $importTypeModel): void
     {
         if (!($team = $importTypeModel->team) || !($game = $importTypeModel->game) || null === $importTypeModel->videoId) {
@@ -106,7 +198,8 @@ readonly class StatisticImportService
                 $playerGameStatistic
                     ->setIsFirstBallSideOut($isFirstBallSideOut)
                     ->setPlayer($player)
-                    ->setGame($game);
+                    ->setGame($game)
+                    ->setBalltimeId($videoId);
 
                 $this->entityManager->persist($playerGameStatistic);
             }

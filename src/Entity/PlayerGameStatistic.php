@@ -16,7 +16,7 @@ class PlayerGameStatistic
     #[ORM\Column]
     private int $id;
 
-    #[ORM\Column(length: 50, unique: true, index: true)]
+    #[ORM\Column(length: 50, index: true)]
     private string $balltimeId;
 
     #[ORM\ManyToOne(inversedBy: 'playerGameStatistics')]
