@@ -262,6 +262,13 @@ button {
     &:hover {
         background-color: var(--primary-dark);
     }
+
+    &:disabled {
+        background-color: var(--border-focus);
+        border-color: var(--border-focus);
+        color: var(--text-muted);
+        cursor: not-allowed;
+    }
 }
 
 select {
@@ -376,5 +383,26 @@ section {
 
     .property {
         color: var(--text-muted)
+    }
+}
+
+.spinner {
+    width: 0.85em;
+    height: 0.85em;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-left: var(--spacing-xs);
+
+    &[data-live-is-loading=""] {
+        display: inline-block !important;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }

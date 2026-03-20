@@ -3,24 +3,6 @@ import DataTable from 'datatables.net-dt';
 let $dataTable = null;
 document.addEventListener('turbo:load', initializePage);
 function initializePage() {
-    const $importButton = $('#import-button');
-    const $importDialog = $('#import-dialog');
-    const importDialog = $importDialog.get(0);
-    $importButton.off('click').on('click', () => importDialog.showModal());
-    $importDialog.off('click').on('click', (event) => {
-        if (event.target == importDialog) {
-            importDialog.close();
-        }
-    });
-    const $bulkImportButton = $('#bulk-import-button');
-    const $bulkImportDialog = $('#bulk-import-dialog');
-    const bulkImportDialog = $bulkImportDialog.get(0);
-    $bulkImportButton.off('click').on('click', () => bulkImportDialog?.showModal());
-    $bulkImportDialog.off('click').on('click', (event) => {
-        if (event.target == bulkImportDialog) {
-            bulkImportDialog.close();
-        }
-    });
     if ($dataTable !== null) {
         $dataTable.destroy();
     }
@@ -31,9 +13,8 @@ function initializePage() {
     if ($table.length === 0) {
         $table = $(`<table id="statistic-table"></table>`).appendTo($tableContainer);
     }
-    const columns = getColumns();
     $dataTable = new DataTable('#statistic-table', {
-        columns: columns,
+        columns: getColumns(),
         language: DatatablesHelper.languageGerman,
         layout: { topEnd: null, bottomStart: 'paging', bottom2Start: 'info', bottomEnd: null },
         order: [{ name: 'game', dir: 'asc' }, { name: 'team', dir: 'asc' }, { name: 'number', dir: 'asc' }],
@@ -41,10 +22,21 @@ function initializePage() {
         destroy: true,
         ajax: {
             url: $tableContainer.data('url'),
+            data: function (data) {
+                let colTeam = data.columns.find(({ name }) => name === 'team');
+                let colGame = data.columns.find(({ name }) => name === 'game');
+                colTeam.search.value = String($('#select-team').val());
+                colGame.search.value = String($('#select-game').val());
+                return data;
+            },
             method: 'POST',
         },
         serverSide: true,
         processing: true,
+        drawCallback: function () {
+            const api = this.api();
+            highlightValues(api);
+        },
     });
     $table.find('thead').prepend($(`
         <tr>
@@ -55,8 +47,38 @@ function initializePage() {
             <th colspan=7>Angriff</th>
             <th>Block</th>
         </tr>`));
-    DatatablesHelper.addOnChangeEventForColumn($dataTable.column(`team:name`), $('#select-team'), true);
-    DatatablesHelper.addOnChangeEventForColumn($dataTable.column(`game:name`), $('#select-game'), true);
+    $('#select-team').on('change', () => {
+        $('#select-game').val('');
+        $dataTable?.draw();
+    });
+    $('#select-game').on('change', () => $dataTable?.draw());
+}
+function highlightValues(api) {
+    const highlightMap = new Map([
+        ['serveSuccesss', 3],
+        ['receive1s', -2],
+        ['receive0s', -2],
+        ['attackAttempts', 3],
+    ]);
+    api.columns().every(function () {
+        const colName = this.name() ?? '';
+        if (!highlightMap.has(colName))
+            return;
+        const data = this.data().unique().toArray().sort((a, b) => b - a);
+        const highlight = highlightMap.get(colName);
+        this.nodes().each((node) => {
+            const $node = $(node);
+            const cellValue = Number($node.text());
+            if (!cellValue)
+                return;
+            for (let i = 0; i < Math.abs(highlight); i++) {
+                if (cellValue === data[i]) {
+                    $node.css('background-color', highlight > 0 ? 'green' : 'red');
+                    break;
+                }
+            }
+        });
+    });
 }
 function getColumns() {
     return [
@@ -110,6 +132,7 @@ function getColumns() {
             title: 'W-L',
             name: 'pointsDiff',
             data: 'pointsDiff',
+            className: 'table-border-right',
         },
         {
             title: 'Ges',
@@ -135,6 +158,7 @@ function getColumns() {
             title: 'Fhl %',
             name: 'serveErrorsPercent',
             data: 'serveErrorsPercent',
+            className: 'table-border-right',
         },
         {
             title: 'Ges',
@@ -165,6 +189,7 @@ function getColumns() {
             title: 'Fhl %',
             name: 'receive0sPercent',
             data: 'receive0sPercent',
+            className: 'table-border-right',
         },
         {
             title: 'Ges',
@@ -200,6 +225,7 @@ function getColumns() {
             title: 'Fhl %',
             name: 'attackErrorsPercent',
             data: 'attackErrorsPercent',
+            className: 'table-border-right',
         },
         {
             title: 'Pkt',

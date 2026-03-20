@@ -37,10 +37,6 @@ class StatisticImportType extends AbstractType
         ]);
 
         $builder->addDependent('game', 'team', function (DependentField $field, ?Team $team) {
-            /* if (!$team) { */
-            /*     return; */
-            /* } */
-
             $field
                 ->add(type: EntityType::class, options: [
                     'class' => Game::class,

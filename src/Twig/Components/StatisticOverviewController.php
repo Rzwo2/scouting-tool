@@ -6,7 +6,6 @@ namespace App\Twig\Components;
 
 use App\Repository\GameRepository;
 use App\Repository\TeamRepository;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -26,7 +25,6 @@ class StatisticOverviewController extends AbstractController
     public function __construct(
         private readonly TeamRepository $teamRepository,
         private readonly GameRepository $gameRepository,
-        private readonly LoggerInterface $logger,
     ) {}
 
     /** @return array<int, array{id: int, name:string}> */
@@ -39,12 +37,6 @@ class StatisticOverviewController extends AbstractController
             ->innerJoin('player.playerGameStatistics', 'stat')
             ->innerJoin('stat.game', 'game')
         ;
-        if ($this->game) {
-            $this->logger->critical('GAME: ' . $this->game);
-            $teams = explode(' : ', $this->game);
-            $qb->where('team.name IN (:teams)')
-                ->setParameter('teams', $teams);
-        }
 
         return $qb->getQuery()->getScalarResult();
     }

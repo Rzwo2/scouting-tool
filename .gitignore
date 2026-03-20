@@ -13,7 +13,7 @@
 /.phpunit.cache/
 ###< phpunit/phpunit ###
 /composer.lock
-
+/symfony.lock
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.php
 /.php-cs-fixer.cache

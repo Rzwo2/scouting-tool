@@ -7,7 +7,11 @@
         <p>Klicke auf „Laden", um die Balltime Videobibliothek abzurufen.</p>
         <button type="button"
                 data-action="live#action"
-                data-live-action-param="loadVideos">Laden</button>
+                data-live-action-param="loadVideos"
+                data-loading="addAttribute(disabled)">
+            Laden
+        </button>
+        <span class="spinner" data-loading></span>
 
     {% elseif step == 'folder_select' %}
         <section class="mb-3">
@@ -25,7 +29,9 @@
         <button type="button"
                 data-action="live#action"
                 data-live-action-param="confirmFolderSelection"
+                data-loading="addAttribute(disabled)"
                 {% if not selectedFolderId %}disabled{% endif %}>Auswählen</button>
+        <span class="spinner" data-loading></span>
 
     {% elseif step == 'conflict_resolve' %}
         {% set conflict = conflicts[currentConflictIndex] %}
@@ -38,18 +44,22 @@
         <div class="button-group">
             <button type="button"
                     data-action="live#action"
+                    data-loading="addAttribute(disabled)"
                     data-live-action-param="resolveConflict"
                     data-live-decision-param="yes">Ja</button>
             <button type="button"
                     data-action="live#action"
+                    data-loading="addAttribute(disabled)"
                     data-live-action-param="resolveConflict"
                     data-live-decision-param="yes_all">Ja, Alle weiteren ({{ remaining }})</button>
             <button type="button"
                     data-action="live#action"
+                    data-loading="addAttribute(disabled)"
                     data-live-action-param="resolveConflict"
                     data-live-decision-param="no">Nein</button>
             <button type="button"
                     data-action="live#action"
+                    data-loading="addAttribute(disabled)"
                     data-live-action-param="resolveConflict"
                     data-live-decision-param="no_all">Nein, Alle weiteren ({{ remaining }})</button>
         </div>
@@ -90,7 +100,9 @@
             </article>
             <button type="button"
                     data-action="live#action:prevent"
+                    data-loading="addAttribute(disabled)"
                     data-live-action-param="executeImport">Bestätigen</button>
+            <span class="spinner" data-loading></span>
         {% endif %}
     {% endif %}
 </div>

@@ -149,6 +149,7 @@ class BulkImportWizard extends AbstractController
         $existingStats = $this->playerGameStatisticRepository->findByBalltimeIds(array_keys($folderVideos));
 
         $this->conflicts = [];
+        $this->videoMappings = [];
         foreach ($folderVideos as $videoId => $video) {
             if (!isset($existingStats[$videoId])) {
                 $this->videoMappings[] = [

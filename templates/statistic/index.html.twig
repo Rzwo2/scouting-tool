@@ -8,14 +8,14 @@
 
 {% block main %}
 {% if is_granted('ROLE_ADMIN') %}
-    <dialog id="import-dialog">
+    <dialog id="import-dialog" closedBy="any">
         <header>
             <h2>Statistik Import</h2>
             <button type="button" class="dialog-close" aria-label="Schließen" commandfor="import-dialog" command="close">&times;</button>
         </header>
         <article>{{ component('StatisticImportForm', {formData: formData, form: form}) }}</article>
     </dialog>
-    <dialog id="bulk-import-dialog">
+    <dialog id="bulk-import-dialog" closedBy="any">
         <header>
             <h2>Bulk Import</h2>
             <button type="button" class="dialog-close" aria-label="Schließen" commandfor="bulk-import-dialog" command="close">&times;</button>

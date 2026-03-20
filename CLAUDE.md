@@ -52,18 +52,26 @@ php bin/phpunit tests/Controller/SomeTest.php   # single test file
 
 ## Frontend (TypeScript)
 
-TypeScript sources live in `assets/ts/`. Compiled output goes to `public/assets/`.
+TypeScript sources live in `assets/ts/`. Compiled output goes to `assets/js-compiled/` (`outDir` in `tsconfig.json`). Entrypoints are registered in `importmap.php` and referenced in Twig via `{{ importmap(['app', 'module-name']) }}`.
 
 ```bash
 npm run ts:build    # one-time compile
 npm run ts:watch    # watch mode
+npx biome check     # JS/TS lint
 ```
 
-The project uses **Symfony Asset Mapper** (no Webpack). JS imports are configured in `importmap.php`. Biome is available for JS/TS linting (`npx biome check`).
+The project uses **Symfony Asset Mapper** (no Webpack). JS imports are configured in `importmap.php`.
 
 **Symfony UX** is used for interactivity:
 - **Stimulus** (`assets/controllers/`) — JS controllers attached to HTML via `data-controller` attributes.
-- **Live Components** (`src/Twig/`) — PHP-backed Twig components that re-render server-side on user interaction. Annotate with `#[AsLiveComponent]` and use `#[LiveProp]` / `#[LiveAction]`.
+- **Live Components** (`src/Twig/Components/`) — PHP-backed components that re-render server-side. Templates live in `templates/components/`. Pattern:
+  - Extend `AbstractController`, use `DefaultActionTrait`
+  - `#[LiveProp]` for readable state; `#[LiveProp(writable: true)]` for 2-way binding via `data-model="propName"` in templates
+  - `#[LiveAction]` methods triggered by `data-action="live#action" data-live-action-param="methodName"` in templates
+  - Pass arguments to `#[LiveArg]`-annotated parameters via `data-live-argName-param="value"`
+  - Call computed getters in templates as `this.getterName` (e.g. `this.teamsData`)
+
+**Dialog handling** uses the HTML Command API: `commandfor="dialog-id" command="show-modal"` / `command="close"` on buttons — no JS needed for open/close.
 
 ## Architecture
 
@@ -107,6 +115,18 @@ EasyAdmin handles all CRUD for Teams, Players, Games, PlayerGameStatistics, User
 ### Async Queue
 
 Symfony Messenger uses a Doctrine transport (`messenger_messages` table). In production, Supervisor runs the worker process (configured in `frankenphp/supervisor.d/`).
+
+### Balltime API Integration
+
+`StatisticImportService` (`src/Domain/Statistic/Import/`) handles imports from the Balltime API:
+- Uses `OptionalCamelCaseToSnakeCaseConverter` (pass `[OptionalCamelCaseToSnakeCaseConverter::CAMEL_CASE_TO_SNAKE_CASE => true]` as serializer context) for snake_case ↔ camelCase conversion on API requests/responses.
+- `PlayerGameStatistic.balltimeId` (unique, indexed) links a stat row to a Balltime video ID and is used to detect duplicate imports.
+- Domain services are `readonly class` — all constructor properties are implicitly readonly.
+- Flash messages in services: use `FlashMessageTrait` (`src/Util/`) which requires a `RequestStack $requestStack` constructor property.
+
+### DynamicForms (Dependent Form Fields)
+
+`Symfonycasts\DynamicForms\DynamicFormBuilder` wraps the standard `FormBuilderInterface` for forms where field options depend on another field's value. Use `$builder->addDependent('child', 'parent', fn(DependentField $field, ?ParentType $value) => ...)`. See `src/Form/Statistic/Import/StatisticImportType.php` for the Team → Game → VideoId cascade example.
 
 ## Code Style
 

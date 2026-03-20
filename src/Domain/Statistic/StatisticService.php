@@ -17,7 +17,7 @@ readonly class StatisticService
 
     public function handleDataFetchRequest(AjaxData $ajaxData): StatisticResponseModel
     {
-        $qb = $this->playerGameStatisticRepository->getQueryForStatisticDataByAjaxData($ajaxData);
+        $qb = $this->playerGameStatisticRepository->getQueryForStatisticDataByAjaxData();
 
         $amountTotal = DataTablesHelper::getAmountTotal($qb);
         DataTablesHelper::applyDataTablesAjaxData($qb, $ajaxData);

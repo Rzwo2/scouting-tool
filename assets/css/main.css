@@ -51,6 +51,7 @@ table {
 
         th {
             border: 1px solid rgba(0, 0, 0, .15);
+            text-align: center !important;
 
             span.dt-column-order:before,
             span.dt-column-order:after {
@@ -60,6 +61,16 @@ table {
             &.ordering-asc span.dt-column-order:before,
             &.ordering-desc span.dt-column-order:after {
                 opacity: .75;
+            }
+        }
+    }
+
+    tbody {
+        tr {
+            td {
+                &.table-border-right {
+                    border-right: 1px solid var(--bg-lighter);
+                }
             }
         }
     }

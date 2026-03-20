@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Domain\DataTable\AjaxData;
 use App\Domain\Statistic\Overview\Model\StatisticModel;
 use App\Entity\Game;
 use App\Entity\PlayerGameStatistic;
@@ -65,7 +64,7 @@ class PlayerGameStatisticRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getQueryForStatisticDataByAjaxData(AjaxData $ajaxData): QueryBuilder
+    public function getQueryForStatisticDataByAjaxData(): QueryBuilder
     {
         $model = StatisticModel::class;
 

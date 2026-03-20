@@ -1,7 +1,6 @@
-import { Api, type ConfigColumns } from 'datatables.net';
+import { AjaxDataColumn, Api, type ConfigColumns } from 'datatables.net';
 import { DatatablesHelper } from '../datatables-helper.ts';
 import DataTable from 'datatables.net-dt';
-import { map } from 'jquery';
 
 let $dataTable: Api<any> | null = null;
 
@@ -20,10 +19,8 @@ function initializePage() {
         $table = $(`<table id="statistic-table"></table>`).appendTo($tableContainer);
     }
 
-    const columns = getColumns();
-
     $dataTable = new DataTable('#statistic-table', {
-        columns: columns,
+        columns: getColumns(),
         language: DatatablesHelper.languageGerman,
         layout: { topEnd: null, bottomStart: 'paging', bottom2Start: 'info', bottomEnd: null },
         order: [{ name: 'game', dir: 'asc' }, { name: 'team', dir: 'asc' }, { name: 'number', dir: 'asc' }],
@@ -31,10 +28,24 @@ function initializePage() {
         destroy: true,
         ajax: {
             url: $tableContainer.data('url'),
+            data: function (data) {
+
+                let colTeam = data.columns.find(({ name }) => name === 'team') as AjaxDataColumn;
+                let colGame = data.columns.find(({ name }) => name === 'game') as AjaxDataColumn;
+
+                colTeam.search.value = String($('#select-team').val());
+                colGame.search.value = String($('#select-game').val());
+
+                return data;
+            },
             method: 'POST',
         },
         serverSide: true,
         processing: true,
+        drawCallback: function () {
+            const api = this.api();
+            highlightValues(api);
+        },
     });
 
     $table.find('thead').prepend($(`
@@ -48,8 +59,39 @@ function initializePage() {
         </tr>`)
     );
 
-    DatatablesHelper.addOnChangeEventForColumn($dataTable.column(`team:name`), $('#select-team'), true);
-    DatatablesHelper.addOnChangeEventForColumn($dataTable.column(`game:name`), $('#select-game'), true);
+    $('#select-team').on('change', () => {
+        $('#select-game').val('');
+        $dataTable?.draw();
+    });
+    $('#select-game').on('change', () => $dataTable?.draw());
+}
+
+function highlightValues(api: Api) {
+    const highlightMap = new Map([
+        ['serveSuccesss', 3],
+        ['receive1s', -2],
+        ['receive0s', -2],
+        ['attackAttempts', 3],
+    ]);
+    api.columns().every(function () {
+        const colName = this.name() ?? '';
+        if (!highlightMap.has(colName)) return;
+
+        const data = this.data().unique().toArray().sort((a, b) => b - a);
+        const highlight = highlightMap.get(colName) as number;
+
+        this.nodes().each((node: HTMLElement) => {
+            const $node = $(node);
+            const cellValue = Number($node.text());
+            if (!cellValue) return;
+            for (let i = 0; i < Math.abs(highlight); i++) {
+                if (cellValue === data[i]) {
+                    $node.css('background-color', highlight > 0 ? 'green' : 'red');
+                    break;
+                }
+            }
+        })
+    })
 }
 
 function getColumns(): ConfigColumns[] {
@@ -99,6 +141,7 @@ function getColumns(): ConfigColumns[] {
             title: 'W-L',
             name: 'pointsDiff',
             data: 'pointsDiff',
+            className: 'table-border-right',
         },
         {
             title: 'Ges',
@@ -124,6 +167,7 @@ function getColumns(): ConfigColumns[] {
             title: 'Fhl %',
             name: 'serveErrorsPercent',
             data: 'serveErrorsPercent',
+            className: 'table-border-right',
         },
         {
             title: 'Ges',
@@ -154,6 +198,7 @@ function getColumns(): ConfigColumns[] {
             title: 'Fhl %',
             name: 'receive0sPercent',
             data: 'receive0sPercent',
+            className: 'table-border-right',
         },
         {
             title: 'Ges',
@@ -189,6 +234,7 @@ function getColumns(): ConfigColumns[] {
             title: 'Fhl %',
             name: 'attackErrorsPercent',
             data: 'attackErrorsPercent',
+            className: 'table-border-right',
         },
         {
             title: 'Pkt',
