@@ -77,7 +77,7 @@ class PlayerGameStatisticRepository extends ServiceEntityRepository
                 CONCAT_WS(', ', player.lastName, player.firstName) as name,
                 SUM(stat.serveAttempts) as serveAttempts,
                 SUM(stat.serveAces) as serveAces,
-                SUM(stat.serveAces + stat.serve1s) as serveSuccesss,
+                SUM(COALESCE(stat.serveAces,0) + COALESCE(stat.serve1s,0)) as serveSuccesss,
                 SUM(stat.serveErrors) as serveErrors,
                 SUM(stat.receiveAttempts) as receiveAttempts,
                 SUM(stat.receive3s) as receive3s,

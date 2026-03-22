@@ -57,6 +57,14 @@ class Game
         return $this->id;
     }
 
+    /** @internal */
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getGameId(): string
     {
         return $this->gameId;
@@ -93,12 +101,12 @@ class Game
         return $this;
     }
 
-    public function getDate(): ?\DateTimeImmutable
+    public function getDate(): \DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function setDate(?\DateTimeImmutable $date): static
+    public function setDate(\DateTimeImmutable $date): static
     {
         $this->date = $date;
 
@@ -123,18 +131,6 @@ class Game
         return $this;
     }
 
-    public function removeGameSet(GameSet $gameSet): static
-    {
-        if ($this->gameSets->removeElement($gameSet)) {
-            // set the owning side to null (unless already changed)
-            if ($gameSet->getGame() === $this) {
-                $gameSet->setGame(null);
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, PlayerGameStatistic>
      */
@@ -148,18 +144,6 @@ class Game
         if (!$this->playerGameStatistics->contains($playerGameStatistic)) {
             $this->playerGameStatistics->add($playerGameStatistic);
             $playerGameStatistic->setGame($this);
-        }
-
-        return $this;
-    }
-
-    public function removePlayerGameStatistic(PlayerGameStatistic $playerGameStatistic): static
-    {
-        if ($this->playerGameStatistics->removeElement($playerGameStatistic)) {
-            // set the owning side to null (unless already changed)
-            if ($playerGameStatistic->getGame() === $this) {
-                $playerGameStatistic->setGame(null);
-            }
         }
 
         return $this;

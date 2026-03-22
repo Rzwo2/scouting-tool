@@ -23,7 +23,7 @@ final class AjaxData
     public function getColumnSearchValue(string $columnName): ?string
     {
         foreach ($this->columns as $column) {
-            if ($column->data === $columnName && $column->search?->value) {
+            if ($column->data === $columnName && $column->search->value) {
                 return $column->search->value;
             }
         }

@@ -50,22 +50,12 @@ readonly class StatisticImportService
         $allNotFoundNumbers = [];
         $allPlayerStatsPerItem = [];
 
-        // Collect all player-stats from Balltime API first (no DB writes yet)
+        // Pre-load all existing PlayerGameStatistic records per game/team in one query each
+        $existingPerItem = [];
         foreach ($importTypeDtoList as $index => $importTypeDto) {
             if (!($team = $importTypeDto->team) || !($game = $importTypeDto->game) || null === $importTypeDto->videoId) {
                 throw new \UnexpectedValueException('Da stimmt was mit dem Formular nicht. Kontaktiere einen Admin');
             }
-
-            $allPlayerStatsPerItem[$index] = [
-                'item' => $importTypeDto,
-                'sideOut1' => $this->getPlayerStatsModelsFromResponse($this->sendRequest($importTypeDto->videoId, isFirstBallSideOut: true)),
-                'sideOut0' => $this->getPlayerStatsModelsFromResponse($this->sendRequest($importTypeDto->videoId, isFirstBallSideOut: false)),
-            ];
-        }
-
-        // Pre-load all existing PlayerGameStatistic records per game/team in one query each
-        $existingPerItem = [];
-        foreach ($importTypeDtoList as $index => $importTypeDto) {
             $existingPerItem[$index] = array_column(
                 array: $this->playerGameStatisticRepository->findImportIndexAndEntityByGameAndTeam($importTypeDto->game, $importTypeDto->team),
                 column_key: 'playerGameStat',
@@ -73,17 +63,24 @@ readonly class StatisticImportService
             );
         }
 
-        // Persist all entities without flushing
-        foreach ($allPlayerStatsPerItem as $index => $data) {
-            /** @var ImportTypeModel $item */
-            $importTypeDto = $data['item'];
-            $existing = $existingPerItem[$index];
+        // Collect all player-stats from Balltime API first (no DB writes yet)
+        foreach ($importTypeDtoList as $index => $importTypeDto) {
+            if (!($team = $importTypeDto->team) || !($game = $importTypeDto->game) || null === $importTypeDto->videoId) {
+                throw new \UnexpectedValueException('Da stimmt was mit dem Formular nicht. Kontaktiere einen Admin');
+            }
 
+            $existing = $existingPerItem[$index];
             foreach ([true, false] as $isFirstBallSideOut) {
-                $playerStatsModels = $isFirstBallSideOut ? $data['sideOut1'] : $data['sideOut0'];
+                $playerStatsModels = $isFirstBallSideOut
+                    ? $this->getPlayerStatsModelsFromResponse($this->sendRequest($importTypeDto->videoId, isFirstBallSideOut: true))
+                    : $this->getPlayerStatsModelsFromResponse($this->sendRequest($importTypeDto->videoId, isFirstBallSideOut: false));
+
+                /** @var int[] $jerseyNumbers */
+                $jerseyNumbers = array_column($playerStatsModels, 'jerseyNumber');
+
                 $players = $this->playerRepository->findByTeamAndPlayerNumbersIndexedByNumber(
                     $importTypeDto->team,
-                    array_column($playerStatsModels, 'jerseyNumber'),
+                    $jerseyNumbers,
                 );
 
                 foreach ($playerStatsModels as $playerStatsModel) {
@@ -177,13 +174,15 @@ readonly class StatisticImportService
         (null !== ($team = $importTypeModel->team) && null !== ($game = $importTypeModel->game) && null !== ($videoId = $importTypeModel->videoId))
             ?: throw new \LogicException('Unmöglich');
 
-        $response = $this->sendRequest($videoId, $isFirstBallSideOut);
-        $playerStatsModels = $this->getPlayerStatsModelsFromResponse($response);
+        $playerStatsModels = $this->getPlayerStatsModelsFromResponse($this->sendRequest($videoId, $isFirstBallSideOut));
 
-        $players = $this->playerRepository->findByTeamAndPlayerNumbersIndexedByNumber($team, array_column($playerStatsModels, 'jerseyNumber'));
+        /** @var int[] $jerseyNumbers */
+        $jerseyNumbers = array_column($playerStatsModels, 'jerseyNumber');
+        $players = $this->playerRepository->findByTeamAndPlayerNumbersIndexedByNumber($team, $jerseyNumbers);
 
         $notFoundNumbers = [];
         foreach ($playerStatsModels as $playerStatsModel) {
+            assert(null !== $playerStatsModel->jerseyNumber);
             if (null === $player = $players[$playerStatsModel->jerseyNumber] ?? null) {
                 $notFoundNumbers[] = $playerStatsModel->jerseyNumber;
                 continue;

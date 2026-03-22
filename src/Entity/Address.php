@@ -42,6 +42,14 @@ class Address
         return $this->id;
     }
 
+    /** @internal */
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getZip(): ?string
     {
         return $this->zip;

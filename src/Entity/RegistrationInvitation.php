@@ -34,6 +34,14 @@ class RegistrationInvitation
         return $this->id;
     }
 
+    /** @internal */
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getEmail(): string
     {
         return $this->email;

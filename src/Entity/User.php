@@ -15,8 +15,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
+    /** @var non-empty-string */
     #[ORM\Column(length: 50)]
     #[Assert\Length(min: 3, max: 50)]
     private string $username;
@@ -43,7 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      *
-     * @return list<mixed>
+     * @return non-empty-array<mixed>
      */
     public function __serialize(): array
     {
@@ -58,11 +59,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
+    /** @internal */
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getUsername(): string
     {
         return $this->username;
     }
 
+    /** @param non-empty-string $username */
     public function setUsername(string $username): static
     {
         $this->username = $username;
@@ -77,7 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return $this->username;
     }
 
     public function getEmail(): string

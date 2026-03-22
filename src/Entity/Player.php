@@ -19,6 +19,9 @@ class Player
     #[ORM\Column(length: 20, unique: true)]
     private string $playerId;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $pictureLink = null;
+
     #[ORM\Column(name: 'first_name', length: 255)]
     private string $firstName;
 
@@ -29,7 +32,7 @@ class Player
     private int $number;
 
     #[ORM\Column]
-    private ?int $height;
+    private int $height;
 
     #[ORM\Column(name: 'birth_date', type: Types::DATE_IMMUTABLE)]
     private \DateTimeImmutable $birthDate;
@@ -62,6 +65,14 @@ class Player
         return $this->id;
     }
 
+    /** @internal */
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getPlayerId(): string
     {
         return $this->playerId;
@@ -70,6 +81,18 @@ class Player
     public function setPlayerId(string $playerId): static
     {
         $this->playerId = $playerId;
+
+        return $this;
+    }
+
+    public function getPictureLink(): ?string
+    {
+        return $this->pictureLink;
+    }
+
+    public function setPictureLink(?string $pictureLink): static
+    {
+        $this->pictureLink = $pictureLink;
 
         return $this;
     }
@@ -171,18 +194,6 @@ class Player
         if (!$this->playerGameStatistics->contains($playerGameStatistic)) {
             $this->playerGameStatistics->add($playerGameStatistic);
             $playerGameStatistic->setPlayer($this);
-        }
-
-        return $this;
-    }
-
-    public function removePlayerGameStatistic(PlayerGameStatistic $playerGameStatistic): static
-    {
-        if ($this->playerGameStatistics->removeElement($playerGameStatistic)) {
-            // set the owning side to null (unless already changed)
-            if ($playerGameStatistic->getPlayer() === $this) {
-                $playerGameStatistic->setPlayer(null);
-            }
         }
 
         return $this;

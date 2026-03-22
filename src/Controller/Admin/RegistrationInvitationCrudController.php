@@ -23,7 +23,11 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/** @extends AbstractCrudController<RegistrationInvitation> */
+/**
+ *  @extends AbstractCrudController<RegistrationInvitation>
+ *
+ *  @template TEntity of RegistrationInvitation
+ */
 class RegistrationInvitationCrudController extends AbstractCrudController
 {
     public function __construct(
@@ -103,7 +107,7 @@ class RegistrationInvitationCrudController extends AbstractCrudController
         }
 
         $invitation = $this->tokenService->createOrUpdateInvitation($entityInstance->getEmail());
-        if (!$invitation) {
+        if (!$invitation->isExpired()) {
             $this->addFlash('error', 'Einladung mit dieser Email wurde bereits erstellt');
 
             return;
@@ -117,6 +121,7 @@ class RegistrationInvitationCrudController extends AbstractCrudController
         }
     }
 
+    /** @param AdminContext<RegistrationInvitation> $context */
     #[AdminRoute(path: '/send-invitation', name: 'send_invitation')]
     public function sendInvitation(AdminContext $context): Response
     {
@@ -143,6 +148,7 @@ class RegistrationInvitationCrudController extends AbstractCrudController
         return $this->redirectToRoute('admin_registration_invitation_index');
     }
 
+    /** @param AdminContext<RegistrationInvitation> $context */
     public function copyLink(AdminContext $context): Response
     {
         $this->addFlash('success', 'Einladungslink wurde in Zwischenablage kopiert');

@@ -48,6 +48,14 @@ class Team
         return $this->id;
     }
 
+    /** @internal */
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getTeamId(): string
     {
         return $this->teamId;
@@ -97,18 +105,6 @@ class Team
         if (!$this->players->contains($player)) {
             $this->players->add($player);
             $player->setTeam($this);
-        }
-
-        return $this;
-    }
-
-    public function removePlayer(Player $player): static
-    {
-        if ($this->players->removeElement($player)) {
-            // set the owning side to null (unless already changed)
-            if ($player->getTeam() === $this) {
-                $player->setTeam(null);
-            }
         }
 
         return $this;

@@ -34,21 +34,25 @@ class BulkImportWizard extends AbstractController
     #[LiveProp]
     public string $step = 'idle';
 
+    /** @var array<string, string> */
     #[LiveProp]
     public array $folders = [];
 
     #[LiveProp(writable: true)]
     public string $selectedFolderId = '';
 
+    /** @var array<string, array{title: string, folderId: ?string}> */
     #[LiveProp]
     public array $allVideos = [];
 
+    /** @var array<int, array{videoId: string, title: string, entryDescription: string, teamId: string,gameId: string}> */
     #[LiveProp]
     public array $conflicts = [];
 
     #[LiveProp]
     public int $currentConflictIndex = 0;
 
+    /** @var array<int, array{videoId: string, title: string, teamId: string,gameId: string}> */
     #[LiveProp(writable: true)]
     public array $videoMappings = [];
 
@@ -109,7 +113,7 @@ class BulkImportWizard extends AbstractController
                 'auth_bearer' => $this->token,
             ]);
 
-            /** @var LibraryResponseDto $dto */
+            /** @var BalltimeVideosResponseDto $dto */
             $dto = $this->serializer->deserialize(
                 $response->getContent(),
                 BalltimeVideosResponseDto::class,
@@ -168,7 +172,7 @@ class BulkImportWizard extends AbstractController
                 'videoId' => $videoId,
                 'title' => $video['title'],
                 'entryDescription' => $game->getTeamOne()->getName() . ' : ' . $game->getTeamTwo()->getName()
-                    . ' (' . $game->getDate()?->format('d.m.Y') . ')',
+                    . ' (' . $game->getDate()->format('d.m.Y') . ')',
                 'teamId' => '',
                 'gameId' => '',
             ];
@@ -226,11 +230,11 @@ class BulkImportWizard extends AbstractController
     public function executeImport(): ?Response
     {
         foreach ($this->videoMappings as $i => $mapping) {
-            if ('' === ($mapping['teamId'] ?? '')) {
+            if ('' === $mapping['teamId']) {
                 unset($this->videoMappings[$i]);
                 continue;
             }
-            if ('' === ($mapping['gameId'] ?? '')) {
+            if ('' === $mapping['gameId']) {
                 $this->errorMessage = 'Bitte Team und Spiel für alle Videos auswählen.';
 
                 return null;

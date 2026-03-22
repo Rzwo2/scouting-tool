@@ -9,11 +9,11 @@ trait RepositoryTrait
     /**
      * Find entities by criteria but return only specified properties.
      *
-     * @param array<string>              $properties Properties to select (e.g., ['id', 'name', 'email'])
-     * @param array<string, mixed>       $criteria   Criteria for filtering
-     * @param array<string, string>|null $orderBy    Order by fields
-     * @param int|null                   $limit      Limit results
-     * @param int|null                   $offset     Offset results
+     * @param array<string>         $properties Properties to select (e.g., ['id', 'name', 'email'])
+     * @param array<string, mixed>  $criteria   Criteria for filtering
+     * @param array<string, string> $orderBy    Order by fields
+     * @param int|null              $limit      Limit results
+     * @param int|null              $offset     Offset results
      *
      * @return array<int, array<string, mixed>> Array of property arrays
      *
@@ -63,10 +63,8 @@ trait RepositoryTrait
         }
 
         /* add orderBy */
-        if (null !== $orderBy) {
-            foreach ($orderBy as $field => $direction) {
-                $qb->addOrderBy(sprintf('%s.%s', $alias, $field), $direction);
-            }
+        foreach ($orderBy as $field => $direction) {
+            $qb->addOrderBy(sprintf('%s.%s', $alias, $field), $direction);
         }
 
         return $qb->getQuery()->getScalarResult();

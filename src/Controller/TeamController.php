@@ -35,6 +35,4 @@ class TeamController extends AbstractController
 
         return new Response($data);
     }
-
-    public function editAction() {}
 }

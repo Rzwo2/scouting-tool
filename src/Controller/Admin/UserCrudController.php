@@ -39,7 +39,7 @@ class UserCrudController extends AbstractCrudController
         yield ChoiceField::new('roles')
             ->setChoices($roleChoices)
             ->allowMultipleChoices()
-            ->renderExpanded('false')
+            ->renderExpanded(false)
             ->onlyOnForms();
     }
 

@@ -27,7 +27,10 @@ trait FlashMessageTrait
     private function getFlashBag(): FlashBagInterface
     {
         try {
-            return $this->requestStack->getSession()->getFlashBag();
+            $flashbag = $this->requestStack->getSession()->getBag('flashes');
+            assert($flashbag instanceof FlashBagInterface);
+
+            return $flashbag;
         } catch (SessionNotFoundException $e) {
             throw new \LogicException('You cannot use flash messages if sessions are disabled. Enable them in "config/packages/framework.yaml".', 0, $e);
         }

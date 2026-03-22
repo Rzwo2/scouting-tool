@@ -98,6 +98,14 @@ class PlayerGameStatistic
         return $this->id;
     }
 
+    /** @internal */
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getBalltimeId(): string
     {
         return $this->balltimeId;
@@ -115,19 +123,19 @@ class PlayerGameStatistic
         return $this->player;
     }
 
-    public function setPlayer(?Player $player): static
+    public function setPlayer(Player $player): static
     {
         $this->player = $player;
 
         return $this;
     }
 
-    public function getGame(): ?Game
+    public function getGame(): Game
     {
         return $this->game;
     }
 
-    public function setGame(?Game $game): static
+    public function setGame(Game $game): static
     {
         $this->game = $game;
 
@@ -362,9 +370,9 @@ class PlayerGameStatistic
         return $this;
     }
 
-    public function getBlockSingle(): ?int
+    public function getBlockBlockSolos(): ?int
     {
-        return $this->blockSingle;
+        return $this->blockBlockSolos;
     }
 
     public function setBlockBlockSolos(?int $blockSolos): static

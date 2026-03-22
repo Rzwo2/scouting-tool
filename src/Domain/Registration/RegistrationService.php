@@ -30,7 +30,7 @@ readonly class RegistrationService
         return (bool) $this->userRepository->count(['email' => $email]);
     }
 
-    public function createOrUpdateInvitation(string $email): ?RegistrationInvitation
+    public function createOrUpdateInvitation(string $email): RegistrationInvitation
     {
         $invitation = $this->invitationRepository->findOneBy(['email' => $email]);
 

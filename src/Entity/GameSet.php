@@ -35,6 +35,14 @@ class GameSet
         return $this->id;
     }
 
+    /** @internal */
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getGame(): Game
     {
         return $this->game;

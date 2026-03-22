@@ -18,7 +18,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -34,7 +33,6 @@ class ImportTeamsCommand extends Command
         private readonly GameRepository $gameRepository,
         private readonly PlayerRepository $playerRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly NormalizerInterface $normalizer,
         private readonly SerializerInterface $serializer,
     ) {
         parent::__construct();
@@ -63,9 +61,12 @@ class ImportTeamsCommand extends Command
         $this->fetchGames($teams);
 
         $links = $linksCrawler
-            ->each(static fn (Crawler $a) => $a->attr('href'));
+            ->each(static fn (Crawler $a) => (string) $a->attr('href'));
         foreach ($links as $link) {
             preg_match('/teamId=(\d*)&/', $link, $matches);
+            if (count($matches) < 2) {
+                throw new \DomainException('"teamId=XXX" not found');
+            }
 
             $team = $teams[$matches[1]];
 
@@ -92,14 +93,13 @@ class ImportTeamsCommand extends Command
         $a = [
             ['teams' => [], 'players' => [], 'games' => 0, 'gameSets' => 0],
         ];
-        if ($data) {
-            $io->table(array_keys($data), [[
-                'teams' => implode("\n", array_column($data, 'teams')),
-                'players' => implode("\n", array_column($data, 'players')),
-                'games' => $data['games'],
-                'gameSets' => $data['gameSets'],
-            ]]);
-        }
+        $io->table(array_keys($data), [[
+            'teams' => implode("\n", array_column($data, 'teams')),
+            'players' => implode("\n", array_column($data, 'players')),
+            'games' => $data['games'],
+            'gameSets' => $data['gameSets'],
+        ]]);
+
         $this->entityManager->flush();
 
         return Command::SUCCESS;
@@ -108,21 +108,27 @@ class ImportTeamsCommand extends Command
     /** @return array<string, Team> */
     private function fetchTeams(Crawler $linksCrawler): array
     {
+        /** @var array<string, string> $dataList */
         $dataList = [];
         $linksCrawler
             ->each(function (Crawler $linkNode) use (&$dataList) {
-                $link = $linkNode->attr('href');
+                $link = $linkNode->attr('href') ?? '';
                 preg_match('/teamId=(\d*)&/', $link, $matches);
+                if (count($matches) < 2) {
+                    throw new \DomainException('"teamId=XXX" not found');
+                }
                 $teamId = $matches[1];
                 $teamName = $linkNode->filter('h1.samsCmsComponentBlockHeader')->first()->innerText();
                 $dataList[$teamId] = $teamName;
             });
         $teamIds = array_keys($dataList);
 
+        /** @var array<string, Team> $indexedExistingTeams */
         $indexedExistingTeams = $this->teamRepository->createQueryBuilder('team', 'team.teamId')->getQuery()->getResult();
 
         $teams = [];
         foreach ($dataList as $teamId => $teamName) {
+            assert(is_string($teamId));
             if (null === $team = $indexedExistingTeams[$teamId] ?? null) {
                 $team = new Team();
                 $this->entityManager->persist($team);
@@ -158,6 +164,9 @@ class ImportTeamsCommand extends Command
             ->each(function (Crawler $row) {
                 [$name, $link] = $row->filter('td:nth-child(1)>a')->extract(['_text', 'href'])[0];
                 preg_match('/teamMemberId=(\d*)&/', $link, $matches);
+                if (count($matches) < 2) {
+                    throw new \DomainException('"teamMemberId=XXX" not found');
+                }
                 $playerId = $matches[1];
                 $height = $row->filter('td:nth-child(2)')->innerText();
                 $birthDate = $row->filter('td:nth-child(3)')->innerText();
@@ -223,7 +232,7 @@ class ImportTeamsCommand extends Command
         $csv = mb_convert_encoding($response->getContent(), 'UTF-8', 'UTF-8, ISO-8859-1');
 
         /** @var GameFetchModel[] $dataList */
-        $dataList = $this->serializer->deserialize($csv, GameFetchModel::class . '[]', 'csv', [CsvEncoder::DELIMITER_KEY => ';', CsvEncoder::ENCLOSURE_KEY]);
+        $dataList = $this->serializer->deserialize($csv, GameFetchModel::class . '[]', 'csv', [CsvEncoder::DELIMITER_KEY => ';']);
 
         $indexedTeams = array_combine(array_map(static fn (Team $team) => $team->getName(), $teams), $teams);
         $indexedGames = $this->gameRepository->createQueryBuilder('game', 'game.gameId')->leftJoin('game.gameSets', 'sets')->getQuery()->getResult();
@@ -240,7 +249,7 @@ class ImportTeamsCommand extends Command
 
             $game
                 ->setGameId($data->gameId)
-                ->setDate(new \DateTimeImmutable("$data->date $data->time"))
+                ->setDate($data->dateTime)
                 ->setTeamOne($indexedTeams[$data->team1])
                 ->setTeamTwo($indexedTeams[$data->team2])
             ;
@@ -248,35 +257,35 @@ class ImportTeamsCommand extends Command
             if (null !== $data->set1Points1) {
                 $gameSet = $this->getGameSet($game, 1)
                     ->setPointsTeamOne($data->set1Points1)
-                    ->setPointsTeamTwo($data->set1Points2)
+                    ->setPointsTeamTwo((int) $data->set1Points2)
                     ->setDurationMinutes($data->set1duration)
                 ;
             }
             if (null !== $data->set2Points1) {
                 $gameSet = $this->getGameSet($game, 2)
                     ->setPointsTeamOne($data->set2Points1)
-                    ->setPointsTeamTwo($data->set2Points2)
+                    ->setPointsTeamTwo((int) $data->set2Points2)
                     ->setDurationMinutes($data->set2duration)
                 ;
             }
             if (null !== $data->set3Points1) {
                 $gameSet = $this->getGameSet($game, 3)
                     ->setPointsTeamOne($data->set3Points1)
-                    ->setPointsTeamTwo($data->set3Points2)
+                    ->setPointsTeamTwo((int) $data->set3Points2)
                     ->setDurationMinutes($data->set3duration)
                 ;
             }
             if (null !== $data->set4Points1) {
                 $gameSet = $this->getGameSet($game, 4)
                     ->setPointsTeamOne($data->set4Points1)
-                    ->setPointsTeamTwo($data->set4Points2)
+                    ->setPointsTeamTwo((int) $data->set4Points2)
                     ->setDurationMinutes($data->set4duration)
                 ;
             }
             if (null !== $data->set5Points1) {
                 $gameSet = $this->getGameSet($game, 5)
                     ->setPointsTeamOne($data->set5Points1)
-                    ->setPointsTeamTwo($data->set5Points2)
+                    ->setPointsTeamTwo((int) $data->set5Points2)
                     ->setDurationMinutes($data->set5duration)
                 ;
             }
@@ -311,7 +320,7 @@ class PlayerModel
     public function __construct(
         public string $playerId,
         public string $name,
-        public string $height,
+        public int $height,
         public string $birthDate,
         public int $number,
         public string $position,
@@ -321,7 +330,7 @@ class PlayerModel
 class GameFetchModel
 {
     public function __construct(
-        #[SerializedName('Datum und Uhrzeit')] public \DateTime $dateTime,
+        #[SerializedName('Datum und Uhrzeit')] public \DateTimeImmutable $dateTime,
         #[SerializedName('#')] public int $gameId,
         #[SerializedName('Mannschaft 1')] public string $team1,
         #[SerializedName('Mannschaft 2')] public string $team2,

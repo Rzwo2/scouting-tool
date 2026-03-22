@@ -10,7 +10,8 @@ class ImportRequestModel
 {
     /** @param string[] $videoIds */
     public function __construct(
-        #[SerializedName('video_ids')] public array $videoIds,
-        public FilterModel $filters = new FilterModel(),
+        #[SerializedName('video_ids')]
+        public array $videoIds,
+        public FilterModel $filters,
     ) {}
 }

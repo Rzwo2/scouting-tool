@@ -10,15 +10,17 @@ class OptionalCamelCaseToSnakeCaseConverter extends CamelCaseToSnakeCaseNameConv
 {
     public const string CAMEL_CASE_TO_SNAKE_CASE = 'camelCaseToSnakeCase';
 
+    /** @param array<string, mixed> $context */
     public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         if (!isset($context[self::CAMEL_CASE_TO_SNAKE_CASE])) {
             return $propertyName;
         }
 
-        return parent::normalize($propertyName, $class, $format, $context);
+        return parent::normalize($propertyName);
     }
 
+    /** @param array<string, mixed> $context */
     public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         if (!isset($context[self::CAMEL_CASE_TO_SNAKE_CASE])) {

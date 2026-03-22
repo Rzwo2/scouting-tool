@@ -116,6 +116,7 @@ class SecurityController extends AbstractController
             $this->addFlash('success', 'Benutzername erfolgreich geändert.');
         } else {
             foreach ($form->getErrors(true) as $error) {
+                assert($error instanceof FormError);
                 $this->addFlash('error', $error->getMessage());
             }
         }
@@ -149,6 +150,7 @@ class SecurityController extends AbstractController
         }
 
         foreach ($form->getErrors(true) as $error) {
+            assert($error instanceof FormError);
             $this->addFlash('error', $error->getMessage());
         }
 

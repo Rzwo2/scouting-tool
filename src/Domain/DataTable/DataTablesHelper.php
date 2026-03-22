@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\DataTable;
 
+use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
@@ -34,13 +35,12 @@ final class DataTablesHelper
             $parameter = "search_$property";
 
             if (is_numeric($searchValue)) {
-                $qb->andWhere("$selectPart = :$parameter");
-            } elseif (is_array($searchValue)) {
-                $qb->andWhere("$selectPart IN (:$parameter)");
+                $qb
+                    ->andWhere("$selectPart = :$parameter");
             } else {
-                $qb->andWhere("$selectPart LIKE :$parameter");
+                $qb->andWhere("$selectPart LIKE %:$parameter%");
             }
-            $qb->setParameter($parameter, "%$searchValue%");
+            $qb->setParameter($parameter, $searchValue);
         }
     }
 
@@ -56,7 +56,7 @@ final class DataTablesHelper
             $name = $column->data ?? $column->name
                 ?? throw new MissingOptionsException('One of data or name must be defined in the column');
 
-            $field = $selectParts[$name];
+            $field = $selectParts[(string) $name];
 
             $qb->addOrderBy($field, strtoupper($order->dir));
         }
@@ -99,15 +99,21 @@ final class DataTablesHelper
     private static function getSelectParts(QueryBuilder $qb): array
     {
         $selectParts = [];
+
+        /** @var Select $select */
         foreach ($qb->getDQLPart('select') as $select) {
-            /** @var Select $select */
             foreach ($select->getParts() as $selectPart) {
+                if ($selectPart instanceof Func) {
+                    $selectPart = $selectPart->__toString();
+                }
+
                 if (str_starts_with($selectPart, 'NEW')) {
                     preg_match_all('/[\(,]\n *(.*) as ([\w_]*)/', $selectPart, $matches);
                     $newSelectArr = array_combine($matches[2], $matches[1]);
                     $selectParts = array_merge($selectParts, $newSelectArr);
                 } else {
                     preg_match('/^(.*) as (.*)$/', $selectPart, $matches);
+                    assert(2 <= count($matches));
                     $selectParts[$matches[2]] = $matches[1];
                 }
             }

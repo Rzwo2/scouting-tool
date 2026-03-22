@@ -39,7 +39,7 @@ class StatisticModel
         public ?int $attackKillsK2 = null,
         public ?int $attackErrors = null,
         public ?int $blockSuccesss = null,
-        private ?int $serveAces = null,
+        ?int $serveAces = null,
     ) {
         $this->pointsTotal = $serveAces + $attackKills + $blockSuccesss;
         $this->pointsDiff = $this->pointsTotal - $serveErrors - $receive0s - $attackErrors;
@@ -52,6 +52,12 @@ class StatisticModel
         $this->attackKillsK2Percent = $this->percent($attackKillsK2, $attackAttemptsK2);
         $this->attackKillsPercent = $this->percent($attackKills, $attackAttempts);
         $this->attackErrorsPercent = $this->percent($attackErrors, $attackAttempts);
+
+        foreach (get_object_vars($this) as $key => $value) {
+            if (0 === $value) {
+                $this->$key = null;
+            }
+        }
     }
 
     private function percent(?int $part, ?int $total): ?float

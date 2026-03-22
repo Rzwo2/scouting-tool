@@ -6,14 +6,12 @@ namespace App\Domain\Entity\Team;
 
 use App\Entity\Team;
 use App\Repository\TeamRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class TeamService
 {
     public function __construct(
         private TeamRepository $teamRepository,
-        private EntityManagerInterface $entityManager,
     ) {}
 
     /** @return array<int, array<string, mixed>> */
