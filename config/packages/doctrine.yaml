@@ -26,6 +26,8 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
+        hydrators:
+            indexed_scalar: App\Doctrine\Hydration\IndexedScalarHydrator
         dql:
             string_functions:
                 concat_ws: DoctrineExtensions\Query\Mysql\ConcatWs

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Player;
 use App\Entity\Team;
+use App\Repository\Trait\PropertyFetchTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -12,7 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PlayerRepository extends ServiceEntityRepository
 {
-    use RepositoryTrait;
+    use PropertyFetchTrait;
 
     public function __construct(ManagerRegistry $registry)
     {

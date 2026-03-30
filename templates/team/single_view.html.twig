@@ -1,0 +1,202 @@
+{% extends 'main.html.twig' %}
+
+{% block title %}{{ team.name }}{% endblock %}
+
+{% block headline %}{{ team.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .team-overview {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-l);
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        .team-info {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-muted);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-l);
+        }
+
+        .team-info h2,
+        .players-section h2 {
+            margin: 0 0 var(--spacing) 0;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-muted);
+            padding-bottom: var(--spacing-s);
+        }
+
+        .team-info dl {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: var(--spacing-s) var(--spacing-l);
+            margin: 0;
+        }
+
+        .team-info dt {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .team-info dd {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing);
+        }
+
+        .player-card {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            align-items: stretch;
+            gap: var(--spacing-s);
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-muted);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: border-color var(--transition-fast);
+            padding: var(--spacing);
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .player-card:hover {
+            border-color: var(--border-focus);
+        }
+
+        .player-card_photo {
+            width: 90px;
+            object-fit: cover;
+            display: block;
+            background-color: var(--bg-lighter);
+        }
+
+        .player-card_photo-placeholder {
+            background-color: var(--bg-lighter);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        .player-card_info {
+            background: none;
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            column-gap: var(--spacing-s);
+            margin: 0;
+
+            dt{
+                color: var(--text-muted);
+            }
+
+            dd{
+                margin: 0;
+            }
+        }
+
+        .player-card_name {
+            grid-column: 1 / -1;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .player-card_meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .player-card_number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .players-empty {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="team-overview">
+
+        <section class="team-info">
+            <h2>Teamdaten</h2>
+            <dl>
+                <dt>Name</dt>
+                <dd>{{ team.name }}</dd>
+
+                <dt>DDV-Nummer</dt>
+                <dd>{{ team.teamId }}</dd>
+
+                {% if team.address %}
+                    <dt>Adresse</dt>
+                    <dd>
+                        {{ team.address.street }} {{ team.address.number }}
+                        {%- if team.address.suffix %}, {{ team.address.suffix }}{% endif %}<br>
+                        {{ team.address.zip }} {{ team.address.city }}<br>
+                        {{ team.address.country }}
+                    </dd>
+                {% endif %}
+            </dl>
+        </section>
+
+        <section class="players-section">
+            <h2>Spieler</h2>
+
+            {% set today = date('now') %}
+            {% set sorted_players = team.players|sort((a, b) => a.number <=> b.number) %}
+
+            {% if sorted_players is empty %}
+                <p class="players-empty">Keine Spieler gefunden.</p>
+            {% else %}
+                <div class="player-grid">
+                    {% for player in sorted_players %}
+                        <article class="player-card">
+                            {% if player.pictureLink is empty %}
+                                <div class="player-card_photo-placeholder">kein Foto</div>
+                            {% else %}
+                                <img
+                                    class="player-card_photo"
+                                    src="{{ player.pictureLink }}"
+                                    alt="{{ player.firstName }} {{ player.lastName }}"
+                                    loading="lazy"
+                                >
+                            {% endif %}
+                            <dl class="player-card_info">
+                                <dd class="player-card_name">{{ player.firstName }} {{ player.lastName }}</dd>
+                                <dt>Nummer:</dt>
+                                    <dd class="player-card_number">{{ player.number }}</dd>
+                                <dt>Größe:</dt>
+                                    <dd>{{ player.height }} cm</dd>
+                                <dt>Alter:</dt>
+                                    <dd>{{ today.diff(player.birthDate).y }} Jahre</dd>
+                                <dt>Position:</dt>
+                                    <dd>{{ player.position }}</dd>
+                            </dl>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+
+    </div>
+{% endblock %}

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Domain\Entity\Team\TeamService;
+use App\Entity\Team;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,12 @@ class TeamController extends AbstractController
         private readonly TeamService $handler,
         private readonly SerializerInterface $serializer,
     ) {}
+
+    #[Route(path: '/{team}', name: 'app_team', methods: ['GET'])]
+    public function getSingleAction(Team $team): Response
+    {
+        return $this->render('team/single_view.html.twig', ['team' => $team]);
+    }
 
     #[Route(name: 'team_index', methods: ['GET'])]
     public function indexAction(): Response

@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Domain\DvvDataImport\Message\PlayerDataImportMessage;
 use App\Entity\Game;
 use App\Entity\GameSet;
 use App\Entity\Player;
@@ -16,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -34,6 +36,7 @@ class ImportTeamsCommand extends Command
         private readonly PlayerRepository $playerRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly SerializerInterface $serializer,
+        private readonly MessageBusInterface $messageBus,
     ) {
         parent::__construct();
     }
@@ -102,10 +105,12 @@ class ImportTeamsCommand extends Command
 
         $this->entityManager->flush();
 
+        $this->messageBus->dispatch(new PlayerDataImportMessage());
+
         return Command::SUCCESS;
     }
 
-    /** @return array<string, Team> */
+    /** @return array<string|int, Team> */
     private function fetchTeams(Crawler $linksCrawler): array
     {
         /** @var array<string, string> $dataList */
@@ -121,21 +126,19 @@ class ImportTeamsCommand extends Command
                 $teamName = $linkNode->filter('h1.samsCmsComponentBlockHeader')->first()->innerText();
                 $dataList[$teamId] = $teamName;
             });
-        $teamIds = array_keys($dataList);
 
         /** @var array<string, Team> $indexedExistingTeams */
         $indexedExistingTeams = $this->teamRepository->createQueryBuilder('team', 'team.teamId')->getQuery()->getResult();
 
         $teams = [];
         foreach ($dataList as $teamId => $teamName) {
-            assert(is_string($teamId));
             if (null === $team = $indexedExistingTeams[$teamId] ?? null) {
                 $team = new Team();
                 $this->entityManager->persist($team);
             }
             $team
                 ->setName($teamName)
-                ->setTeamId($teamId);
+                ->setTeamId((string) $teamId);
             $teams[$teamId] = $team;
             unset($indexedExistingTeams[$teamId]);
         }

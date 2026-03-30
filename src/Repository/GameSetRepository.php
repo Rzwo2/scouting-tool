@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\GameSet;
+use App\Repository\Trait\PropertyFetchTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,33 +12,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class GameSetRepository extends ServiceEntityRepository
 {
+    use PropertyFetchTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, GameSet::class);
     }
-
-    //    /**
-    //     * @return GameSet[] Returns an array of GameSet objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?GameSet
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

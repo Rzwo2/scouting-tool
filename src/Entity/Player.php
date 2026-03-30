@@ -16,7 +16,7 @@ class Player
     #[ORM\Column]
     private int $id;
 
-    #[ORM\Column(length: 20, unique: true)]
+    #[ORM\Column(length: 20, unique: true, index: true)]
     private string $playerId;
 
     #[ORM\Column(nullable: true)]

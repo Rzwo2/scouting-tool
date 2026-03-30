@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\RegistrationInvitation;
+use App\Repository\Trait\PropertyFetchTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,7 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /** @extends ServiceEntityRepository<RegistrationInvitation> */
 class RegistrationInvitationRepository extends ServiceEntityRepository
 {
-    use RepositoryTrait;
+    use PropertyFetchTrait;
 
     public function __construct(ManagerRegistry $registry)
     {

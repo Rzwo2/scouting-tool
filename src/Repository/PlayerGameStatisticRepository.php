@@ -6,6 +6,7 @@ use App\Domain\Statistic\Overview\Model\StatisticModel;
 use App\Entity\Game;
 use App\Entity\PlayerGameStatistic;
 use App\Entity\Team;
+use App\Repository\Trait\PropertyFetchTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -15,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PlayerGameStatisticRepository extends ServiceEntityRepository
 {
-    use RepositoryTrait;
+    use PropertyFetchTrait;
 
     public function __construct(ManagerRegistry $registry)
     {
